@@ -46,6 +46,7 @@ Når du går videre til et nyt trin, nævn da hvilket trin du nu arbejder på.
    2. Hvis subagenten mener der skal laves ændringer så lav dem. Spørg brugeren opfølgende spørgsmål hvis det er nødvendigt.
    3. Gentag trin 7.1 (med en ny subagent) og 7.2 indtil projekterfaringen lever op til retningslinjerne.
 8. Giv brugeren en mulighed for selv at reviewe RESUME filen og for at komme med forslag til ændringer. Fortæl dem hvis de beder dig gøre noget der er imod retningslinjerne, men gør stadig som de siger.
-9. Brug Task værktøjet til ved hjælp af en subagent at oversætte projekterfaringen med /translate skill'en.
-10. Giv brugeren en mulighed for selv at reviewe den oversatte projekterfaringensfil og for at foreslå ændringer til oversættelsen. Indholdet bør ikke ændres, da det skal være ens i den danske og engelske projekterfaring.
-11. Projekterfaringen er nu færdig. Fortæl brugeren at de kan starte en ny session hvis de ønsker at skrive endnu en projekterfaring.
+9. Brug Task værktøjet til ved hjælp af en subagent at finde kompetencer med /match-competencies skill'en. Giv agenten end handoff af relevant information fra denne samtale også selvom det ikke er skrevet i projekterfaringen.
+10. Brug Task værktøjet til ved hjælp af en subagent at oversætte projekterfaringen med /translate skill'en.
+11. Giv brugeren en mulighed for selv at reviewe den oversatte projekterfaringensfil og for at foreslå ændringer til oversættelsen. Indholdet bør ikke ændres, da det skal være ens i den danske og engelske projekterfaring.
+12. Projekterfaringen er nu færdig. Fortæl brugeren at de kan starte en ny session hvis de ønsker at skrive endnu en projekterfaring.
