@@ -15,10 +15,10 @@
   - ✅ flyt template til en reference i resume-assistant skill og forklar hvornår den skal laves
   - tilføj kompetence udtrækning til fremgangsmåde
 - SKILL -- translate
-  - oversæt 1:1 hvad der står
-  - oversæt ikke fagtermer
+  - ✅ oversæt 1:1 hvad der står
+  - ✅ oversæt ikke fagtermer
   - hvad skal der gøres ved overskrifter?
-- SKILL -- review skill
+- ✅ SKILL -- review skill
 - ✅ lave template -- RESUME.TEMPLATE.md
 - ✅ tilføj det gode eksempel -- GOOD-EXAMPLE.md
 - Havde Marlene lavet et bedre eksempel end quality street fra twoday tiden?
