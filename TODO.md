@@ -1,25 +1,5 @@
 # Opgaver der skal udføres
 
-- ✅ Skal det være **dansk** eller ~engelsk~?
-- AGENTS.md
-  - ✅ Vi skriver på dansk (medmindre vi oversætter)
-- SKILL -- resume-assistant
-  - ✅ skal skrive til en RESUME.md fil løbende. Læs altid filen
-  - ✅ skriv trin-for-trin fremgangsmåde
-  - ✅ beskriv at det kun er én projekterfaring som indgår i et større CV
-  - ✅ hvad er en projekterfaring
-  - ✅ beskriv retningslinjer for en projekterfaring - refererer til GOOD-EXAMPLE.md
-  - ✅ find på eksempler på spørgsmål som kan hjælpe brugeren med at udrede deres erfaring
-    - ✅ hvad er den ting du har udført som du er mest stolt af?
-  - ✅ omskriv så den kan lave flere projekterfaringer ved at kaldes flere gange - fil skal hedde projects/[project-name].md
-  - ✅ flyt template til en reference i resume-assistant skill og forklar hvornår den skal laves
-  - ✅ tilføj kompetence udtrækning til fremgangsmåde
-- SKILL -- translate
-  - ✅ oversæt 1:1 hvad der står
-  - ✅ oversæt ikke fagtermer
-  - hvad skal der gøres ved overskrifter?
-- ✅ SKILL -- review skill
-- ✅ lave template -- RESUME.TEMPLATE.md
-- ✅ tilføj det gode eksempel -- GOOD-EXAMPLE.md
-- Havde Marlene lavet et bedre eksempel end quality street fra twoday tiden?
-- ✅ tilføj liste af kompetencer, udtrukket fra flowcase
+- Tilføj frontmatter til skills
+- Translate skill: hvad skal der gøres ved overskrifter?
+- Good example: Havde Marlene lavet et bedre eksempel end quality street fra twoday tiden?
