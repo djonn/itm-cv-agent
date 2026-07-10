@@ -8,8 +8,8 @@
   - ✅ skriv trin-for-trin fremgangsmåde
   - ✅ beskriv at det kun er én projekterfaring som indgår i et større CV
   - ✅ hvad er en projekterfaring
-  - beskriv retningslinjer for en projekterfaring - refererer til GOOD-EXAMPLE.md
-  - find på eksempler på spørgsmål som kan hjælpe brugeren med at udrede deres erfaring
+  - ✅ beskriv retningslinjer for en projekterfaring - refererer til GOOD-EXAMPLE.md
+  - ✅ find på eksempler på spørgsmål som kan hjælpe brugeren med at udrede deres erfaring
     - ✅ hvad er den ting du har udført som du er mest stolt af?
   - ✅ omskriv så den kan lave flere projekterfaringer ved at kaldes flere gange - fil skal hedde projects/[project-name].md
   - ✅ flyt template til en reference i resume-assistant skill og forklar hvornår den skal laves

@@ -1,5 +1,5 @@
 Denne fil et et godkendt og annoteret eksempel på en projekterfaring.
-Annoteringer med beskrivelse af enkelte segmenter er markeret med `//` og skal ikke inkludres i den endelige projekterfaring.
+Annoteringer med beskrivelse af enkelte segmenter er markeret med `//` og skal ikke inkluderes i den endelige projekterfaring.
 
 # Projekterfaring
 

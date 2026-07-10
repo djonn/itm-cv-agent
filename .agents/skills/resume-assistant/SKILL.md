@@ -10,7 +10,7 @@ Når du opretter en subagent sørg da for at fortælle dem hvilken fil de skal a
 
 ## Retningslinjer
 
-TODO:
+En projekterfaring er arbejdet på ét projekt ved en kunde. Har brugeren været på mere end ét projekt ved samme kunde bør disse oprettes som 2 separate projekterfaringer. Dette kan ske ved at blive solgt ud til samme kunde flere gange eller ved at kunden flytter brugeren fra ét projekt til et anden i løbet af deres kontraktperiode.
 
 CV'et skrives i tredje person og bruger gerne personens navn hvor der i første person ville have været brugt "jeg". Fx: "Jonas startede ud med at tage ansvaret for [...]"
 
@@ -29,8 +29,6 @@ Eksempler på spørgsmål:
 Du skal også meget gerne stille opfølgende spørgsmål som får brugeren til at uddybe det du allerede har fået at vide og udspecificere tvetydighed.
 
 Når du stiller spørgsmål så stil kun ét enkelt spørgsmål ad gangen, da det ellers kan være uklart hvilket spørgsmål vi snakker om.
-
-TODO:
 
 ## Fremgangsmåde
 
