@@ -20,5 +20,6 @@
   - hvad skal der gøres ved overskrifter?
 - SKILL -- review skill
 - ✅ lave template -- RESUME.TEMPLATE.md
-- tilføj det gode eksempel -- GOOD-EXAMPLE.md
+- ✅ tilføj det gode eksempel -- GOOD-EXAMPLE.md
+- Havde Marlene lavet et bedre eksempel end quality street fra twoday tiden?
 - tilføj liste af kompetencer, udtrukket fra flowcase

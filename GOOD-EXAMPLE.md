@@ -17,17 +17,20 @@ Kompetencer:
 Kundenavn: Quality Street
 Projektnavn: Machine cloud connectivity
 
-Quality Street is a candy and snack producer with a huge presence in Europe, especially within the grandmother-segment.
-The purpose of the project was to utilize data metrics from different factory production machines to ensure a more even distribution of the different chocolates in the big Quality Street tins. This was important for the customer, as they have received a lot of complaints regarding too many of the Strawberry Delight-chocolates.
+Quality Street er en slik- og snack-producent med en enorm tilstedeværelse i Europa, især inden for bedstemor-segmentet.
+
+Formålet med projektet var at udnytte data metrics fra forskellige fabriksproduktionsmaskiner til at sikre en mere ensartet distribution af de forskellige chokolader i de store Quality Street bøtter. Dette var vigtigt for kunden, da de har modtaget en del klager vedrørende for mange af Strawberry Delight-chokoladerne.
 
 ## Udviklerens rolle
 
 Navn på rolle: Software Developer (Backend) & assistant architect
 
-John Doe worked in a team with a Senior Architect, two backenders, and one frontender (also from IT Minds). Every 2 weeks they met with a representative of Danish Grandmothers to advise them.
-The first phase of the project was defining the architecture and talking to managers to understand the challenge at hand. John Doe took part in defining the initial architecture for the data platform along with the Senior Architect of the team.
-The team ended up choosing a “data lake” setup where vast amounts of data from the different factory machines could be deposited.
-The machines send their data in very different formats, groupings and frequencies to a central hub, where it is stored temporarily in the raw form. Several different functions then consume this data in order to streamline it to a universal format, before it is inserted into the data lake.
-The team chose to keep the machines (and the IoT Edge device for each) dumb, in order to reduce the amount of software changes needed on on-premise-devices. For the central hub, it was decided to use an Azure event hub, and Azure Functions to parse and reformat the data.
-John Doe built the majority of the Azure Functions, and helped with configuration of the Azure IoT event hub.
-John Doe also helped create a website with a dashboard for management, building a GraphQL API for the data lake and assisting with some of the features for the page, which was written in React.
+John Doe arbejdede i et team med en Senior Architelt, to backendere og én frontender (også fra IT Minds). Hver 2. uge mødtes de med en repræsentant for Danish Grandmothers for at rådgive dem.
+
+Den første fase af projektet bestod i at definere arkitekturen og tale med managers for at forstå den aktuelle udfordring. John Doe deltog i at definere den oprindelige arkitektur for dataplatformen sammen med teamets Senior Architekt.
+
+Teamet endte med at vælge et "data lake"-setup, hvor enorme mængder data fra de forskellige fabriksmaskiner kunne deponeres. Maskinerne sender deres data i meget forskellige formater, grupperinger og frekvenser til en central hub, hvor det midlertidigt lagres i det rå format. Flere forskellige funktioner transformerer derefter disse data for at strømline dem til et universelt format, før de indsættes i data laken.
+
+Teamet valgte at holde maskinerne (og IoT Edge-enheden for hver) "dum" for at reducere mængden af softwareændringer, der var nødvendige på on-premise-enheder. For den centrale hub blev det besluttet at bruge en Azure event hub og Azure Functions til at parse og reformatere dataene.
+
+John Doe byggede størstedelen af disse Azure Functions og hjalp med konfigurationen af Azure IoT event hubben. John Doe hjalp også med at oprette en hjemmeside med et dashboard til management, hvor han byggede et GraphQL API til data laken og assisterede med nogle af funktionerne til siden, som var skrevet i React.
