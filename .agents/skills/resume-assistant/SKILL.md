@@ -24,6 +24,7 @@ Eksempler på spørgsmål:
 
 - Kan du beskrive hvordan dit team så ud og hvilken rolle du havde i teamet?
 - Hvad er den ting du har udført som du er mest stolt af?
+- Hvilken betydning havde projektet og dit arbejde for kunden eller for projektets brugere?
 
 Du skal også meget gerne stille opfølgende spørgsmål som får brugeren til at uddybe det du allerede har fået at vide og udspecificere tvetydighed.
 
