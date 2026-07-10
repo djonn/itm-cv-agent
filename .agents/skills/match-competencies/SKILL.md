@@ -1,3 +1,8 @@
+---
+name: match-competencies
+description: Find kompetencer der matcher projekterfaringen.
+---
+
 Din opgave er at finde matchende kompetencer i ./COMPETENCIES.md filen baseret på informationerne givet i CV/resume filen du bør være givet samt hvad end anden information du er blevet givet.
 
 Begynd IKKE selv at lede efter information ved at læse andre filer end de specificerede.
