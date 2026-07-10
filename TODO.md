@@ -10,10 +10,15 @@
   - ✅ hvad er en projekterfaring
   - beskriv retningslinjer for en projekterfaring - refererer til GOOD-EXAMPLE.md
   - find på eksempler på spørgsmål som kan hjælpe brugeren med at udrede deres erfaring
-    - hvad er den ting du har udført som du er mest stolt af?
-- ✅ lavet RESUME.TEMPLATE.md
-- tilføj det gode eksempel -- GOOD-EXAMPLE.md
+    - ✅ hvad er den ting du har udført som du er mest stolt af?
+  - ✅ omskriv så den kan lave flere projekterfaringer ved at kaldes flere gange - fil skal hedde projects/[project-name].md
+  - ✅ flyt template til en reference i resume-assistant skill og forklar hvornår den skal laves
+  - tilføj kompetence udtrækning til fremgangsmåde
 - SKILL -- translate
   - oversæt 1:1 hvad der står
   - oversæt ikke fagtermer
+  - hvad skal der gøres ved overskrifter?
 - SKILL -- review skill
+- ✅ lave template -- RESUME.TEMPLATE.md
+- tilføj det gode eksempel -- GOOD-EXAMPLE.md
+- tilføj liste af kompetencer, udtrukket fra flowcase
