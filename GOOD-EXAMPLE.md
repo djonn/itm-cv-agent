@@ -32,6 +32,7 @@ Som et resultat af den bedre distribution af chokolader er salget af Quality Str
 ## Udviklerens rolle
 
 Navn på rolle: Software Developer (Backend) & assistant architect
+// Rollen på et projekt behøver ikke passe med en jobtitel
 
 John Doe arbejdede i et team med en Senior Architelt, to backendere og én frontender (også fra IT Minds). Hver 2. uge mødtes de med en repræsentant for Danish Grandmothers for at rådgive dem.
 // Præsenter teamet og – hvis muligt – relevante stakeholders.
