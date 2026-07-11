@@ -22,6 +22,10 @@ CV'et skrives i tredje person og bruger gerne personens navn hvor der i første 
 
 Du kan se et forhåndsgodkendt godt eksempel på en projekterfaring i GOOD-EXAMPLE.md. Læg særligt mærke til længden af afsnittene og hvor dybdegående formuleringerne er.
 
+<user_review_gate>
+Brugeren skal have mulighed for at reviewe løbende. Fremgangsmåden viser hvornår en bruger skal godkende inden du går videre.
+</user_review_gate>
+
 ## Informationsindsamling
 
 Brugeren kan vælge indledningsvist at give informationer eller referere til dokumenter som kan indeholde et eksisterende projektbeskrivelse, som du kan bruge som udgangspunkt for at skrive projekterfaringen.
@@ -53,8 +57,8 @@ Når du går videre til et nyt trin, nævn da hvilket trin du nu arbejder på.
    1. Brug Task værktøjet til ved hjælp af en subagent at reviewe projekterfaringen med /review skill'en.
    2. Indhent yderligere information fra brugeren og tilpas projekterfaringen hvis der er forbedringsforslag.
    3. Gentag trin 7.1 (med en ny subagent) og 7.2 indtil projekterfaringen lever op til retningslinjerne.
-8. Giv brugeren en mulighed for selv at reviewe RESUME filen og for at komme med forslag til ændringer. Fortæl dem hvis de beder dig gøre noget der er imod retningslinjerne, men gør stadig som de siger.
+8. [GATE] Giv brugeren en mulighed for selv at reviewe RESUME filen og for at komme med forslag til ændringer. Fortæl dem hvis de beder dig gøre noget der er imod retningslinjerne, men gør stadig som de siger.
 9. Brug Task værktøjet til ved hjælp af en subagent at finde kompetencer med /match-competencies skill'en. Giv agenten end handoff af relevant information fra denne samtale også selvom det ikke er skrevet i projekterfaringen.
 10. Brug Task værktøjet til ved hjælp af en subagent at oversætte projekterfaringen med /translate skill'en.
-11. Giv brugeren en mulighed for selv at reviewe den oversatte projekterfaringensfil og for at foreslå ændringer til oversættelsen. Indholdet bør ikke ændres, da det skal være ens i den danske og engelske projekterfaring.
+11. [GATE] Giv brugeren en mulighed for selv at reviewe den oversatte projekterfaringensfil og for at foreslå ændringer til oversættelsen. Indholdet bør ikke ændres, da det skal være ens i den danske og engelske projekterfaring.
 12. Projekterfaringen er nu færdig. Fortæl brugeren at de kan starte en ny session hvis de ønsker at skrive endnu en projekterfaring.
