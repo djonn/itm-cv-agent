@@ -22,6 +22,13 @@ CV'et skrives i tredje person og bruger gerne personens navn hvor der i første 
 
 Du kan se et forhåndsgodkendt godt eksempel på en projekterfaring i GOOD-EXAMPLE.md. Læg særligt mærke til længden af afsnittene og hvor dybdegående formuleringerne er.
 
+En projekterfaringsfil består af følgende afsnit:
+
+1. **Start/Slut dato**: Måned/år format for når arbejdet på projektet startede og sluttede.
+2. **Kunde**: Beskriver kunden, deres forretningsmodel, projektets formål. Personen nævnes ikke her.
+3. **Udviklerens rolle**: Introducerer personen med navn, beskriver teamet, deres rolle, konkrete opgaver og præstationer. Det er her personens bidrag detaljeres.
+4. **Kompetencer**: Liste over teknologier og kompetencer brugt i projektet.
+
 <user_review_gate>
 Brugeren skal have mulighed for at reviewe løbende. Fremgangsmåden viser hvornår en bruger skal godkende inden du går videre.
 </user_review_gate>
@@ -40,7 +47,13 @@ Stil gerne opfølgende spørgsmål som får brugeren til at uddybe det du allere
 
 <single_question_enforcement>
 Stil spørgsmål et af gangen og vent på feedback på hvert spørgsmål før du fortsætter. At stille flere spørgsmål på én gang kan være forvirrende.
+Kombiner heller ikke flere spørgsmål i ét.
 </single_question_enforcement>
+
+<information_tracking>
+Før du stiller et opfølgende spørgsmål, tjek hvad brugeren allerede har svaret på.
+Undgå at stille spørgsmål om information der allerede er givet.
+</information_tracking>
 
 ## Fremgangsmåde
 
