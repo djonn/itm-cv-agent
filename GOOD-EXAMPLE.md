@@ -6,15 +6,6 @@ Annoteringer med beskrivelse af enkelte segmenter er markeret med `//` og skal i
 Start dato (måned/år): 10/2024
 Slut dato (måned/år): 07/2026
 
-Kompetencer:
-
-- IoT
-- Azure Functions
-- Azure Event Hub
-- Data Lake
-- React
-- GraphQL
-
 ## Kunde
 
 Kundenavn: Quality Street
@@ -48,3 +39,12 @@ Teamet valgte at holde maskinerne (og IoT Edge-enheden for hver) "dum" for at re
 
 John Doe byggede størstedelen af disse Azure Functions og hjalp med konfigurationen af Azure IoT event hubben. John Doe hjalp også med at oprette en hjemmeside med et dashboard til management, hvor han byggede et GraphQL API til data laken og assisterede med nogle af funktionerne til siden, som var skrevet i React.
 // Prøv at gemme den tunge tekniske jargon og name-dropping til slutningen. At gøre teksten gradvist mere teknisk gør det nemmere at følge med for ikke-tekniske læsere.
+
+## Kompetencer
+
+- IoT
+- Azure Functions
+- Azure Event Hub
+- Data Lake
+- React
+- GraphQL

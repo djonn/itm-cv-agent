@@ -3,17 +3,6 @@
 Start date (month/year): 10/2024
 End date (month/year): 08/2026
 
-Competencies:
-
-- C#
-- .NET
-- React
-- SignalR
-- Event Sourcing
-- CQRS
-- Elixir
-- Azure
-
 ## Client
 
 Client name: Bunker Holding
@@ -36,3 +25,14 @@ Jonas took responsibility for developing a new Contract Management feature that 
 A central part of Jonas' work was leading the migration from Elixir/Phoenix/LiveView to C#/.NET and React with SignalR. Jonas and the team chose to approach the migration using a strangler pattern to minimize risk: First, LiveView pages not related to live auctions were taken over by React with REST endpoints. Then responsibility was gradually moved to .NET. Jonas designed an adapter/repository pattern for master data so the auction engine could continue accessing companies, ports, fuel types, and ships without interruptions. On the .NET side, Jonas implemented a wrapper service that calls Elixir endpoints to fetch auction state and perform mutating actions, ensuring continuity during the migration.
 
 The platform uses event sourcing and CQRS, which provides automatic auditing of all actions in an auction - a significant advantage in the regulated bunkering industry where compliance and traceability are critical to meeting industry requirements. Jonas ensured that real-time updates from the original LiveView architecture were preserved in the new SignalR-based solution, so users could continue to follow live bidding without delays.
+
+## Competencies
+
+- C#
+- .NET
+- React
+- SignalR
+- Event Sourcing
+- CQRS
+- Elixir
+- Azure

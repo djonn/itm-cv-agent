@@ -3,17 +3,6 @@
 Start dato (måned/år): 10/2024
 Slut dato (måned/år): 08/2026
 
-Kompetencer:
-
-- C#
-- .NET
-- React
-- SignalR
-- Event Sourcing
-- CQRS
-- Elixir
-- Azure
-
 ## Kunde
 
 Kundenavn: Bunker Holding
@@ -37,3 +26,13 @@ En central del af Jonas' arbejde var ansvaret for migrationen fra Elixir/Phoenix
 
 Platformen benytter event sourcing og CQRS, hvilket giver automatisk auditing af alle handlinger i en auktion - en væsentlig fordel i den regulerede bunkeringsbranche hvor compliance og sporbarhed er kritisk for at opfylde branchens krav. Jonas sikrede at realtidsopdateringerne fra den oprindelige LiveView-arkitektur blev bevaret i den nye SignalR-baserede løsning, så brugere fortsat kunne følge med i live budgivning uden forsinkelser.
 
+## Kompetencer
+
+- C#
+- .NET
+- React
+- SignalR
+- Event Sourcing
+- CQRS
+- Elixir
+- Azure

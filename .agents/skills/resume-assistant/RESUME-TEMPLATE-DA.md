@@ -3,10 +3,6 @@
 Start dato (måned/år):
 Slut dato (måned/år):
 
-Kompetencer:
-
-- [Liste af kompetencer]
-
 ## Kunde
 
 Kundenavn:
@@ -19,3 +15,7 @@ Projektnavn:
 Navn på rolle:
 
 [Hvad udvikleren lavede på dette projekt]
+
+## Kompetencer
+
+- [Liste af kompetencer]
