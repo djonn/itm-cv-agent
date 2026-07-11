@@ -2,6 +2,8 @@
 description: Review en projekterfaring og foreslå forbedringer til indhold og struktur.
 mode: subagent
 temperature: 0.3
+tools:
+  skill: false
 permission:
   edit: deny
   bash: deny

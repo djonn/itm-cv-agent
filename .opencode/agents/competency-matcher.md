@@ -2,6 +2,8 @@
 description: Find kompetencer der matcher projekterfaringen.
 mode: subagent
 temperature: 0.2
+tools:
+  skill: false
 permission:
   edit: deny
   bash: deny

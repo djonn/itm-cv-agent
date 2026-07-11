@@ -2,6 +2,8 @@
 description: Oversæt projekterfaringen fra dansk til engelsk.
 mode: subagent
 temperature: 0.1
+tools:
+  skill: false
 permission:
   edit: deny
   bash: deny
