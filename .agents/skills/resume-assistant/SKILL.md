@@ -50,7 +50,7 @@ Når du går videre til et nyt trin, nævn da hvilket trin du nu arbejder på.
 6. Skriv til projekterfaringsfilen.
 7. Review projekterfaringsfilen.
    1. Brug Task værktøjet til ved hjælp af en subagent at reviewe projekterfaringen med /review skill'en.
-   2. Hvis subagenten mener der skal laves ændringer så lav dem. Spørg brugeren opfølgende spørgsmål hvis det er nødvendigt.
+   2. Indhent yderligere information fra brugeren og tilpas projekterfaringen hvis der er forbedringsforslag.
    3. Gentag trin 7.1 (med en ny subagent) og 7.2 indtil projekterfaringen lever op til retningslinjerne.
 8. Giv brugeren en mulighed for selv at reviewe RESUME filen og for at komme med forslag til ændringer. Fortæl dem hvis de beder dig gøre noget der er imod retningslinjerne, men gør stadig som de siger.
 9. Brug Task værktøjet til ved hjælp af en subagent at finde kompetencer med /match-competencies skill'en. Giv agenten end handoff af relevant information fra denne samtale også selvom det ikke er skrevet i projekterfaringen.
