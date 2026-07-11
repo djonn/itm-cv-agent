@@ -35,3 +35,4 @@ Når du reviewer en projekterfaring, skal du særligt tjekke:
 2. **Informationsflow**: Information skal introduceres før den refereres til. Undgå at teksten nævner "de to integrationer" eller "OOM-problemet" i Kunde-afsnittet hvis disse først beskrives senere.
 3. **Konsistens**: Undgå redundant gentagelse af samme information på tværs af afsnit.
 4. **Forretningsresultater**: Projekterfaringen bør indeholde konkrete (og gerne målbare) resultater hvor muligt.
+5. **Sprogbrug**: Tjek for stavefejl og underlig sprogbrug.
