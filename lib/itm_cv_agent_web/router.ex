@@ -18,6 +18,11 @@ defmodule ItMinds.CvAgentWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live "/conversations", ConversationLive.Index, :index
+    live "/conversations/new", ConversationLive.Form, :new
+    live "/conversations/:id", ConversationLive.Show, :show
+    live "/conversations/:id/edit", ConversationLive.Form, :edit
   end
 
   # Other scopes may use custom stacks.
