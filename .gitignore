@@ -37,3 +37,7 @@ npm-debug.log
 
 # Windows System for Linux
 *:Zone.Identifier
+
+# environment files
+.env*
+!.env.example
