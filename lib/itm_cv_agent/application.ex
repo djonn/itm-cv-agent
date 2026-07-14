@@ -15,7 +15,8 @@ defmodule ItMinds.CvAgent.Application do
       # Start a worker by calling: ItMinds.CvAgent.Worker.start_link(arg)
       # {ItMinds.CvAgent.Worker, arg},
       # Start to serve requests, typically the last entry
-      ItMinds.CvAgentWeb.Endpoint
+      ItMinds.CvAgentWeb.Endpoint,
+      ItMinds.CvAgent.AgentSupervisor
     ]
 
     # See https://elixir.hexdocs.pm/Supervisor.html
