@@ -20,10 +20,10 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   defp messages(%{messages: []} = assigns) do
     ~H"""
     <div>
-        <div class="h-[50dvh]" />
-        <p>
-          To get started why don't you tell me about the project?
-        </p>
+      <div class="h-[50dvh]" />
+      <p>
+        To get started why don't you tell me about the project?
+      </p>
     </div>
     """
   end
@@ -91,7 +91,11 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
               }
             }
           </script>
-          <button type="submit" class="flex flex-col justify-around pr-3 cursor-pointer" aria-label={gettext("close")}>
+          <button
+            type="submit"
+            class="flex flex-col justify-around pr-3 cursor-pointer"
+            aria-label={gettext("close")}
+          >
             <.icon name="hero-paper-airplane" class="size-5" />
           </button>
         </.form>
@@ -105,12 +109,16 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     context = socket.assigns.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
 
     {:ok, response} = ReqLLM.generate_text(ItMinds.CvAgent.LLM.model(), context)
-    answer = response.message.content |> Enum.find(& &1.type == :text) |> Map.get(:text)
+    answer = response.message.content |> Enum.find(&(&1.type == :text)) |> Map.get(:text)
 
     {
       :noreply,
       socket
-      |> assign(:messages, socket.assigns.messages ++ [%{type: :user, message: message}, %{type: :assistant, message: answer}])
+      |> assign(
+        :messages,
+        socket.assigns.messages ++
+          [%{type: :user, message: message}, %{type: :assistant, message: answer}]
+      )
       |> assign(:context, response.context)
       |> assign(:form, to_form(%{"chat" => ""}))
     }
@@ -125,7 +133,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
      |> assign(:page_title, conversation.name || "Conversation")
      |> assign(:conversation, conversation)
      |> assign(:messages, [])
-     |> assign(:context, ReqLLM.Context.new([]))
+     |> assign(:context, ItMinds.CvAgent.LLM.new_context())
      |> assign(:form, to_form(%{"chat" => ""}))}
   end
 end
