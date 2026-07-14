@@ -12,11 +12,12 @@ defmodule ItMinds.CvAgent.Application do
       ItMinds.CvAgent.Repo,
       {DNSCluster, query: Application.get_env(:itm_cv_agent, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ItMinds.CvAgent.PubSub},
-      # Start a worker by calling: ItMinds.CvAgent.Worker.start_link(arg)
-      # {ItMinds.CvAgent.Worker, arg},
       # Start to serve requests, typically the last entry
       ItMinds.CvAgentWeb.Endpoint,
-      ItMinds.CvAgent.AgentSupervisor
+      # Start the Registry
+      {Registry, keys: :unique, name: ItMinds.CvAgent.AgentRegistry},
+      # start the DynamicSupervisor
+      {ItMinds.CvAgent.AgentSupervisor, []}
     ]
 
     # See https://elixir.hexdocs.pm/Supervisor.html
