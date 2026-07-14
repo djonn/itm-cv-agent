@@ -102,14 +102,9 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
 
   @impl true
   def handle_event("send", %{"message" => message}, socket) do
-    model = ReqLLM.model!(%{
-      provider: :openai,
-      id: "google/gemma-4-26b-a4b-it:bf16",
-      base_url: "https://api.scaleway.ai/05232108-8415-474e-b3f6-fe485984e92d/v1",
-    })
     context = socket.assigns.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
 
-    {:ok, response} = ReqLLM.generate_text(model, context)
+    {:ok, response} = ReqLLM.generate_text(ItMinds.CvAgent.LLM.model(), context)
     answer = response.message.content |> Enum.find(& &1.type == :text) |> Map.get(:text)
 
     {
