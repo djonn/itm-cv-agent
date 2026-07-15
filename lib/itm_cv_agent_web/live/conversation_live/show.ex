@@ -2,6 +2,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   use ItMinds.CvAgentWeb, :live_view
 
   alias ItMinds.CvAgent.{AgentInstance, AgentSupervisor, Conversations}
+  alias ItMinds.CvAgentWeb.Markdown
 
   @impl Phoenix.LiveView
   def render(assigns) do
@@ -68,7 +69,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   defp message(%{type: :assistant} = assigns) do
     ~H"""
     <div class="flex flex-row justify-start py-5">
-      <p>{@message}</p>
+      <div><Markdown.markdown text={@message} /></div>
     </div>
     """
   end

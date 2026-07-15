@@ -74,7 +74,8 @@ defmodule ItMinds.CvAgent.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:syn, "~> 3.3"},
-      {:req_llm, "~> 1.17"}
+      {:req_llm, "~> 1.17"},
+      {:mdex, "~> 0.11"}
     ]
   end
 
