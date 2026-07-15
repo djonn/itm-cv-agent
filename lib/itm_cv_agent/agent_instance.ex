@@ -49,8 +49,16 @@ defmodule ItMinds.CvAgent.AgentInstance do
   def handle_cast({:prompt, message}, state) do
     context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
 
+    # TODO: debug logging
+    message |> IO.inspect(label: "prompt")
+
     {:ok, response} = ReqLLM.generate_text(ItMinds.CvAgent.LLM.model(), context)
 
+    # TODO: debug logging
+    response.message.content
+    |> Enum.find(&(&1.type == :text))
+    |> Map.get(:text)
+    |> IO.inspect(label: "answer")
 
     new_state = Map.put(state, :context, response.context)
 
