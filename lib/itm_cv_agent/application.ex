@@ -7,6 +7,10 @@ defmodule ItMinds.CvAgent.Application do
 
   @impl true
   def start(_type, _args) do
+    :syn.add_node_to_scopes([
+      :agents
+    ])
+
     children = [
       ItMinds.CvAgentWeb.Telemetry,
       ItMinds.CvAgent.Repo,
@@ -14,8 +18,6 @@ defmodule ItMinds.CvAgent.Application do
       {Phoenix.PubSub, name: ItMinds.CvAgent.PubSub},
       # Start to serve requests, typically the last entry
       ItMinds.CvAgentWeb.Endpoint,
-      # Start the Registry
-      {Registry, keys: :unique, name: ItMinds.CvAgent.AgentRegistry},
       # start the DynamicSupervisor
       {ItMinds.CvAgent.AgentSupervisor, []}
     ]

@@ -8,10 +8,10 @@ defmodule ItMinds.CvAgent.AgentInstance do
   alias ItMinds.CvAgent.ProjectExperience
   alias ItMinds.CvAgent.AgentSupervisor
 
-  defstruct [:me, :phase, :context, :project_experience]
+  defstruct [:instance_id, :phase, :context, :project_experience]
 
   @type t :: %__MODULE__{
-          me: {String.t(), module()},
+          instance_id: {module(), String.t()},
           phase:
             :setup
             | :customer_interview
@@ -24,20 +24,20 @@ defmodule ItMinds.CvAgent.AgentInstance do
         }
 
   # Public
-  def start_link(me) do
-    GenServer.start_link(__MODULE__, me)
+  def start_link(instance_id, opts) do
+    GenServer.start_link(__MODULE__, instance_id, opts)
   end
 
   def send_prompt(name, message) do
-    AgentSupervisor.via_registry(name, __MODULE__)
+    AgentSupervisor.via_syn(name, __MODULE__)
     |> GenServer.cast({:prompt, message})
   end
 
   # Private
-  def init(me) do
+  def init(instance_id) do
     {:ok,
      %__MODULE__{
-       me: me,
+       instance_id: instance_id,
        phase: :setup,
        context: LLM.new_context(),
        project_experience: %ProjectExperience{}
@@ -52,8 +52,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
       state
       |> Map.put(:context, response.context)
 
-    # TODO: How do I set "me" as in {name, agent_module}
-    broadcast_async_response(state.me, new_state)
+    broadcast_async_response(state.instance_id, new_state)
 
     {:no_reply, new_state}
   end
@@ -62,14 +61,14 @@ defmodule ItMinds.CvAgent.AgentInstance do
     :ok =
       PubSub.subscribe(
         ItMinds.CvAgent.PubSub,
-        AgentSupervisor.via_registry(name, agent_module) |> inspect()
+        AgentSupervisor.via_syn(name, agent_module) |> inspect()
       )
   end
 
   def broadcast_async_response({name, agent_module}, message) do
     PubSub.broadcast(
       ItMinds.CvAgent.PubSub,
-      AgentSupervisor.via_registry(name, agent_module) |> inspect(),
+      AgentSupervisor.via_syn(name, agent_module) |> inspect(),
       {:async_response, message}
     )
   end
