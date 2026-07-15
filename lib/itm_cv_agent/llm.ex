@@ -11,7 +11,8 @@ defmodule ItMinds.CvAgent.LLM do
 
   def new_context() do
     Context.new([
-      Context.system(assistant_system_prompt())
+      # TODO: Removed while testing for faster answer
+      # Context.system(assistant_system_prompt())
     ])
   end
 
