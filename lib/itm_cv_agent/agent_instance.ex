@@ -35,6 +35,11 @@ defmodule ItMinds.CvAgent.AgentInstance do
     |> GenServer.cast({:prompt, message})
   end
 
+  def get_state(name) do
+    AgentSupervisor.find_server(name, __MODULE__)
+    |> GenServer.call(:get_state)
+  end
+
   # Private
   def init(instance_id) do
     {:ok,
@@ -44,6 +49,10 @@ defmodule ItMinds.CvAgent.AgentInstance do
        context: LLM.new_context(),
        project_experience: %ProjectExperience{}
      }}
+  end
+
+  def handle_call(:get_state, _from, state) do
+    {:reply, {:ok, state}, state}
   end
 
   def handle_cast({:prompt, message}, state) do
