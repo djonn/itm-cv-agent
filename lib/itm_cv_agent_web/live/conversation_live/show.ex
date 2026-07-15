@@ -145,13 +145,16 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   def mount(%{"id" => id}, _session, socket) do
     conversation = Conversations.get_conversation!(id)
     AgentSupervisor.ensure_started(conversation.id, AgentInstance)
+    {:ok, state} = AgentInstance.get_state(conversation.id)
     AgentInstance.subscribe(conversation.id, AgentInstance)
+
+    messages = context_to_message(state.context)
 
     {:ok,
      socket
      |> assign(:page_title, conversation.name || "Conversation")
      |> assign(:conversation, conversation)
-     |> assign(:messages, [])
+     |> assign(:messages, messages)
      |> assign(:loading, false)
      |> assign(:form, to_form(%{"chat" => ""}))}
   end
