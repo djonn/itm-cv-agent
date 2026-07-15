@@ -34,14 +34,14 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     <div class="h-[calc(100dvh-64px-126px)] overflow-auto scrollbar-none">
       <div class="flex flex-col-reverse">
         <div class="h-[64px]" />
+        <div :if={@loading}>
+          <p>Loading...</p>
+        </div>
         <.message
           :for={message_envelop <- @messages |> Enum.reverse()}
           type={message_envelop.type}
           message={message_envelop.message}
         />
-        <div :if={@loading}>
-          <p>Loading...</p>
-        </div>
       </div>
     </div>
     """
@@ -122,8 +122,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
 
   @impl Phoenix.LiveView
   def handle_info({:new_state, new_state}, socket) do
-    new_state |> IO.inspect(label: "new_state")
-    messages = [%{type: :user, message: "message"}, %{type: :assistant, message: "answer"}]
+    messages = context_to_message(new_state.context)
 
     {
       :noreply,
@@ -131,6 +130,17 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
       |> assign(:loading, false)
       |> assign(:messages, messages)
     }
+  end
+
+  defp context_to_message(context) do
+    context
+    |> ReqLLM.Context.to_list()
+    |> Enum.filter(&(&1.role in [:user, :assistant]))
+    |> Enum.flat_map(fn message ->
+      message.content |> Enum.map(&%{message: message, content_part: &1})
+    end)
+    |> Enum.filter(&(&1.content_part.type == :text))
+    |> Enum.map(&%{type: &1.message.role, message: &1.content_part.text})
   end
 
   @impl Phoenix.LiveView
