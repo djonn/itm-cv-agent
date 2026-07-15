@@ -1,14 +1,14 @@
 defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   use ItMinds.CvAgentWeb, :live_view
 
-  alias ItMinds.CvAgent.Conversations
+  alias ItMinds.CvAgent.{AgentInstance, AgentSupervisor, Conversations}
 
-  @impl true
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
       <div class="w-full h-[calc(100dvh-64px)] flex flex-col ">
-        <.messages messages={@messages} />
+        <.messages messages={@messages} loading={@loading} />
         <.chat_input form={@form} />
       </div>
     </Layouts.app>
@@ -16,8 +16,9 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   end
 
   attr :messages, :list, required: true, doc: "the list of user and assistant messages"
+  attr :loading, :boolean, required: true
 
-  defp messages(%{messages: []} = assigns) do
+  defp messages(%{messages: [], loading: false} = assigns) do
     ~H"""
     <div>
       <div class="h-[50dvh]" />
@@ -38,6 +39,9 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
           type={message_envelop.type}
           message={message_envelop.message}
         />
+        <div :if={@loading}>
+          <p>Loading...</p>
+        </div>
       </div>
     </div>
     """
@@ -104,36 +108,43 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     """
   end
 
-  @impl true
+  @impl Phoenix.LiveView
   def handle_event("send", %{"message" => message}, socket) do
-    context = socket.assigns.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
-
-    {:ok, response} = ReqLLM.generate_text(ItMinds.CvAgent.LLM.model(), context)
-    answer = response.message.content |> Enum.find(&(&1.type == :text)) |> Map.get(:text)
+    :ok = AgentInstance.send_prompt(socket.assigns.conversation.id, message)
 
     {
       :noreply,
       socket
-      |> assign(
-        :messages,
-        socket.assigns.messages ++
-          [%{type: :user, message: message}, %{type: :assistant, message: answer}]
-      )
-      |> assign(:context, response.context)
+      |> assign(:loading, true)
       |> assign(:form, to_form(%{"chat" => ""}))
     }
   end
 
-  @impl true
+  @impl Phoenix.LiveView
+  def handle_info({:new_state, new_state}, socket) do
+    new_state |> IO.inspect(label: "new_state")
+    messages = [%{type: :user, message: "message"}, %{type: :assistant, message: "answer"}]
+
+    {
+      :noreply,
+      socket
+      |> assign(:loading, false)
+      |> assign(:messages, messages)
+    }
+  end
+
+  @impl Phoenix.LiveView
   def mount(%{"id" => id}, _session, socket) do
     conversation = Conversations.get_conversation!(id)
+    AgentSupervisor.ensure_started(conversation.id, AgentInstance)
+    AgentInstance.subscribe(conversation.id, AgentInstance)
 
     {:ok,
      socket
      |> assign(:page_title, conversation.name || "Conversation")
      |> assign(:conversation, conversation)
      |> assign(:messages, [])
-     |> assign(:context, ItMinds.CvAgent.LLM.new_context())
+     |> assign(:loading, false)
      |> assign(:form, to_form(%{"chat" => ""}))}
   end
 end

@@ -10,8 +10,10 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
   defstruct [:instance_id, :phase, :context, :project_experience]
 
+  @type instance_id_t :: {module(), String.t()}
+
   @type t :: %__MODULE__{
-          instance_id: {module(), String.t()},
+          instance_id: instance_id_t(),
           phase:
             :setup
             | :customer_interview
@@ -29,7 +31,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
   end
 
   def send_prompt(name, message) do
-    AgentSupervisor.via_syn(name, __MODULE__)
+    AgentSupervisor.find_server(name, __MODULE__)
     |> GenServer.cast({:prompt, message})
   end
 
@@ -44,32 +46,34 @@ defmodule ItMinds.CvAgent.AgentInstance do
      }}
   end
 
-  def handle_cast({:prompt, message}, _from, state) do
+  def handle_cast({:prompt, message}, state) do
     context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
+
     {:ok, response} = ReqLLM.generate_text(ItMinds.CvAgent.LLM.model(), context)
 
-    new_state =
-      state
-      |> Map.put(:context, response.context)
 
-    broadcast_async_response(state.instance_id, new_state)
+    new_state = Map.put(state, :context, response.context)
 
-    {:no_reply, new_state}
+    broadcast(state.instance_id, {:new_state, new_state})
+
+    {:noreply, new_state}
   end
 
-  def subscribe_async_response(name, agent_module) do
+  @spec subscribe(String.t(), module()) :: :ok
+  def subscribe(name, agent_module) do
     :ok =
       PubSub.subscribe(
         ItMinds.CvAgent.PubSub,
-        AgentSupervisor.via_syn(name, agent_module) |> inspect()
+        "#{agent_module}:#{name}"
       )
   end
 
-  def broadcast_async_response({name, agent_module}, message) do
+  @spec broadcast(instance_id_t(), term()) :: :ok | {:error, term()}
+  def broadcast({agent_module, name}, message) do
     PubSub.broadcast(
       ItMinds.CvAgent.PubSub,
-      AgentSupervisor.via_syn(name, agent_module) |> inspect(),
-      {:async_response, message}
+      "#{agent_module}:#{name}",
+      message
     )
   end
 end
