@@ -58,23 +58,24 @@ defmodule ItMinds.CvAgent.AgentInstance do
   def handle_cast({:prompt, message}, state) do
     context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
 
-    # TODO: debug logging
-    message |> IO.inspect(label: "prompt")
+    {:ok, stream_response} = ReqLLM.stream_text(ItMinds.CvAgent.LLM.model(), context)
 
-    {:ok, response} = ReqLLM.generate_text(ItMinds.CvAgent.LLM.model(), context)
-
-    # TODO: debug logging
-    response.message.content
-    |> Enum.find(&(&1.type == :text))
-    |> Map.get(:text)
-    |> IO.inspect(label: "answer")
+    {:ok, response} =
+      ReqLLM.StreamResponse.process_stream(stream_response,
+        on_chunk: &handle_stream_chunk(&1, state.instance_id)
+      )
 
     new_state = Map.put(state, :context, response.context)
-
     broadcast(state.instance_id, {:new_state, new_state})
 
     {:noreply, new_state}
   end
+
+  defp handle_stream_chunk(%{type: :content, text: message}, instance_id) do
+    broadcast(instance_id, {:update_stream, %{id: System.unique_integer(), message: message}})
+  end
+
+  defp handle_stream_chunk(_stream_chunk, _instance_id), do: :ok
 
   @spec subscribe(String.t(), module()) :: :ok
   def subscribe(name, agent_module) do

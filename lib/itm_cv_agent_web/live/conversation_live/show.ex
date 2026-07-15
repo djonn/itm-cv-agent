@@ -8,7 +8,8 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <Layouts.app flash={@flash}>
       <div class="w-full h-[calc(100dvh-64px)] flex flex-col ">
-        <.messages messages={@messages} loading={@loading} />
+        <.messages messages={@messages} loading={@loading} streaming_message={@streams.stream} />
+        <%!-- <.stream_message :if={not @loading} stream={@streams.stream} /> --%>
         <.chat_input form={@form} />
       </div>
     </Layouts.app>
@@ -17,6 +18,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
 
   attr :messages, :list, required: true, doc: "the list of user and assistant messages"
   attr :loading, :boolean, required: true
+  attr :streaming_message, :any, required: true
 
   defp messages(%{messages: [], loading: false} = assigns) do
     ~H"""
@@ -33,10 +35,15 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <div class="h-[calc(100dvh-64px-126px)] overflow-auto scrollbar-none">
       <div class="flex flex-col-reverse">
+        <%!-- NOTE: Elements are reversed so we scroll to bottom automatically --%>
         <div class="h-[64px]" />
         <div :if={@loading}>
           <p>Loading...</p>
         </div>
+        <.streaming_message
+          :if={@loading}
+          streaming_message={@streaming_message}
+        />
         <.message
           :for={message_envelop <- @messages |> Enum.reverse()}
           type={message_envelop.type}
@@ -62,6 +69,18 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <div class="flex flex-row justify-start py-5">
       <p>{@message}</p>
+    </div>
+    """
+  end
+
+  attr :streaming_message, :any, required: true
+
+  defp streaming_message(assigns) do
+    ~H"""
+    <div class="flex flex-row justify-start py-5">
+      <p id="stream-parent" phx-update="stream">
+        <span :for={{dom_id, message} <- @streaming_message} id={dom_id}>{message.message}</span>
+      </p>
     </div>
     """
   end
@@ -122,14 +141,17 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
 
   @impl Phoenix.LiveView
   def handle_info({:new_state, new_state}, socket) do
-    messages = context_to_message(new_state.context)
-
     {
       :noreply,
       socket
       |> assign(:loading, false)
-      |> assign(:messages, messages)
+      |> stream(:stream, [], reset: true)
+      |> assign(:messages, context_to_message(new_state.context))
     }
+  end
+
+  def handle_info({:update_stream, message}, socket) do
+    {:noreply, stream_insert(socket, :stream, message)}
   end
 
   defp context_to_message(context) do
@@ -157,6 +179,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
      |> assign(:page_title, conversation.name || "Conversation")
      |> assign(:conversation, conversation)
      |> assign(:messages, messages)
+     |> stream(:stream, [])
      |> assign(:loading, false)
      |> assign(:form, to_form(%{"chat" => ""}))}
   end
