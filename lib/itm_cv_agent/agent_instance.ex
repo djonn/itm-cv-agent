@@ -62,7 +62,12 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
     {:ok, response} =
       ReqLLM.StreamResponse.process_stream(stream_response,
-        on_chunk: &handle_stream_chunk(&1, state.instance_id)
+        on_result: fn chunk ->
+          broadcast(
+            state.instance_id,
+            {:update_stream, %{id: System.unique_integer(), message: chunk}}
+          )
+        end
       )
 
     new_state = Map.put(state, :context, response.context)
@@ -70,12 +75,6 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
     {:noreply, new_state}
   end
-
-  defp handle_stream_chunk(%{type: :content, text: message}, instance_id) do
-    broadcast(instance_id, {:update_stream, %{id: System.unique_integer(), message: message}})
-  end
-
-  defp handle_stream_chunk(_stream_chunk, _instance_id), do: :ok
 
   @spec subscribe(String.t(), module()) :: :ok
   def subscribe(name, agent_module) do
