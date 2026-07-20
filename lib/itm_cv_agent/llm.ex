@@ -31,12 +31,40 @@ defmodule ItMinds.CvAgent.LLM do
   @spec write_project_experience_tool() :: ReqLLM.Tool.t()
   defp write_project_experience_tool() do
     Tool.new!(
-      name: "get_weather",
-      description: "Get current weather for a location",
+      name: "write_project_experience",
+      description: "Write a segment of the project experience",
       parameter_schema: [
-        location: [type: :string, required: true, doc: "City name"]
+        section: [
+          type:
+            {:in,
+             [
+               :customer_name,
+               :project_name,
+               :project_description,
+               :employee_role_name,
+               :employee_role_description,
+               :competencies,
+               :start_date,
+               :end_date,
+               :employee_name
+             ]},
+          required: true,
+          doc: "What section to write to"
+        ],
+        language: [
+          type: {:in, ["da", "en"]},
+          required: false,
+          default: :da,
+          doc: "Write default danish file or english translation"
+        ],
+        value: [
+          type: :string,
+          required: true,
+          doc: "The new content of the section, everything in the section will be overridden"
+        ]
       ],
-      callback: fn _args -> {:ok, %{temperature: 23, unit: "celsium"}} end
+      # callback is not actually used as it is specially handled in agent_instance
+      callback: fn _args -> nil end
     )
   end
 end
