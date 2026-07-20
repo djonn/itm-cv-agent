@@ -57,22 +57,22 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
   def handle_cast({:prompt, message}, state) do
     context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
+    state = state |> Map.put(:context, context)
+    new_state = handle_llm(state)
 
-    new_context = handle_llm(context, state)
-
-    new_state = Map.put(state, :context, new_context)
     broadcast(state.instance_id, {:new_state, new_state})
 
     {:noreply, new_state}
   end
 
-  defp handle_llm(context, state) do
-    last_message = List.last(context.messages)
+  defp handle_llm(state) do
+    last_message = state.context.messages |> List.last()
 
     cond do
       is_user_prompt?(last_message) ->
-        response = call_llm(context, state)
-        handle_llm(response.context, state)
+        response = call_llm(state)
+        state = state |> Map.put(:context, response.context)
+        handle_llm(state)
 
       has_tool_call?(last_message) ->
         tool_results =
@@ -85,23 +85,23 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
         context =
           ReqLLM.Context.append(
-            context,
+            state.context,
             tool_results
           )
 
-        response = call_llm(context, state)
-        handle_llm(response.context, state)
+        response = call_llm(state |> Map.put(:context, context))
+        handle_llm(state |> Map.put(:context, response.context))
 
       true ->
-        context
+        state
     end
   end
 
-  defp call_llm(context, state) do
+  defp call_llm(state) do
     {:ok, stream_response} =
       ReqLLM.stream_text(
         LLM.model(),
-        context,
+        state.context,
         tools: LLM.setup_tools()
       )
 
