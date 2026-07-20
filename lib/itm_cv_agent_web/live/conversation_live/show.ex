@@ -47,6 +47,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
         />
         <.message
           :for={message_envelop <- @messages |> Enum.reverse()}
+          :key={message_envelop.key}
           type={message_envelop.type}
           message={message_envelop.message}
         />
@@ -159,11 +160,13 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     context
     |> ReqLLM.Context.to_list()
     |> Enum.filter(&(&1.role in [:user, :assistant]))
-    |> Enum.flat_map(fn message ->
-      message.content |> Enum.map(&%{message: message, content_part: &1})
-    end)
-    |> Enum.filter(&(&1.content_part.type == :text))
-    |> Enum.map(&%{type: &1.message.role, message: &1.content_part.text})
+    |> Enum.with_index()
+    |> Enum.map(fn {message, index} -> format_message(message, index) end)
+  end
+
+  defp format_message(message, index) do
+    text_part = message.content |> Enum.find(fn part -> part.type == :text end)
+    %{type: message.role, message: text_part.text, key: index}
   end
 
   @impl Phoenix.LiveView
