@@ -58,7 +58,52 @@ defmodule ItMinds.CvAgent.AgentInstance do
   def handle_cast({:prompt, message}, state) do
     context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
 
-    {:ok, stream_response} = ReqLLM.stream_text(ItMinds.CvAgent.LLM.model(), context)
+    new_context = handle_llm(context, state)
+
+    new_state = Map.put(state, :context, new_context)
+    broadcast(state.instance_id, {:new_state, new_state})
+
+    {:noreply, new_state}
+  end
+
+  defp handle_llm(context, state) do
+    last_message = List.last(context.messages)
+
+    cond do
+      is_user_prompt?(last_message) ->
+        response = call_llm(context, state)
+        handle_llm(response.context, state)
+
+      has_tool_call?(last_message) ->
+        tool_results =
+          last_message.tool_calls
+          |> Enum.map(fn %{id: id, function: function} ->
+            tool = Enum.find(LLM.setup_tools(), fn t -> t.name == function.name end)
+            {:ok, result} = ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments))
+            ReqLLM.Context.tool_result(id, result)
+          end)
+
+        context =
+          ReqLLM.Context.append(
+            context,
+            tool_results
+          )
+
+        response = call_llm(context, state)
+        handle_llm(response.context, state)
+
+      true ->
+        context
+    end
+  end
+
+  defp call_llm(context, state) do
+    {:ok, stream_response} =
+      ReqLLM.stream_text(
+        LLM.model(),
+        context,
+        tools: LLM.setup_tools()
+      )
 
     {:ok, response} =
       ReqLLM.StreamResponse.process_stream(stream_response,
@@ -70,11 +115,18 @@ defmodule ItMinds.CvAgent.AgentInstance do
         end
       )
 
-    new_state = Map.put(state, :context, response.context)
-    broadcast(state.instance_id, {:new_state, new_state})
-
-    {:noreply, new_state}
+    response
   end
+
+  defp is_user_prompt?(message) do
+    message.role == :user
+  end
+
+  defp has_tool_call?(%{tool_calls: tool_calls}) when is_list(tool_calls) do
+    tool_calls |> Enum.any?()
+  end
+
+  defp has_tool_call?(_message), do: false
 
   @spec subscribe(String.t(), module()) :: :ok
   def subscribe(name, agent_module) do
