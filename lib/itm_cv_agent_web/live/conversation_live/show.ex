@@ -134,11 +134,16 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   def handle_event("send", %{"message" => message}, socket) do
     :ok = AgentInstance.send_prompt(socket.assigns.conversation.id, message)
 
+    new_messages =
+      socket.assigns.messages ++
+        [%{type: :user, message: message, key: socket.assigns.messages |> Enum.count()}]
+
     {
       :noreply,
       socket
       |> assign(:loading, true)
       |> assign(:form, to_form(%{"chat" => ""}))
+      |> assign(:messages, new_messages)
     }
   end
 
