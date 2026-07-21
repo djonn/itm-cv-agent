@@ -10,7 +10,6 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     <Layouts.app flash={@flash}>
       <div class="w-full h-[calc(100dvh-64px)] flex flex-col ">
         <.messages messages={@messages} loading={@loading} streaming_message={@streams.stream} />
-        <%!-- <.stream_message :if={not @loading} stream={@streams.stream} /> --%>
         <.chat_input form={@form} />
       </div>
     </Layouts.app>
@@ -81,7 +80,9 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <div class="flex flex-row justify-start py-5">
       <p id="stream-parent" phx-update="stream">
-        <span :for={{dom_id, message} <- @streaming_message} id={dom_id}>{message.message}</span>
+        <div :for={{dom_id, message} <- @streaming_message} id={dom_id}>
+          {raw(message.html)}
+        </div>
       </p>
     </div>
     """
@@ -147,13 +148,24 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
       :noreply,
       socket
       |> assign(:loading, false)
+      |> assign(:stream_mdex, MDEx.new(streaming: true))
       |> stream(:stream, [], reset: true)
       |> assign(:messages, context_to_message(new_state.context))
     }
   end
 
   def handle_info({:update_stream, message}, socket) do
-    {:noreply, stream_insert(socket, :stream, message)}
+    md_doc = MDEx.Document.put_markdown(socket.assigns.stream_mdex, message.message)
+    html_content = MDEx.to_html!(md_doc)
+
+    message = message |> Map.put(:html, html_content) |> Map.put(:id, "streaming")
+
+    {
+      :noreply,
+      socket
+      |> stream_insert(:stream, message)
+      |> assign(:stream_mdex, md_doc)
+    }
   end
 
   defp context_to_message(context) do
@@ -183,6 +195,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
      |> assign(:page_title, conversation.name || "Conversation")
      |> assign(:conversation, conversation)
      |> assign(:messages, messages)
+     |> assign(:stream_mdex, MDEx.new(streaming: true))
      |> stream(:stream, [])
      |> assign(:loading, false)
      |> assign(:form, to_form(%{"chat" => ""}))}
