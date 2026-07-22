@@ -24,9 +24,14 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <div>
       <div class="h-[50dvh]" />
-      <p>
-        To get started why don't you tell me about the project?
-      </p>
+      <div>
+        <p>
+          Start med at fortælle mig lidt om dit projekt, det behøver ikke være meget, bare så jeg har noget at gå ud fra.
+        </p>
+        <p>
+          Hvis du vil forbedre en eksisterende projekterfaring kan du også copy-paste direkte fra Flowcase.
+        </p>
+      </div>
     </div>
     """
   end
