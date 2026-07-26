@@ -75,40 +75,43 @@ defmodule ItMinds.CvAgent.AgentInstance do
         handle_llm(state)
 
       has_tool_call?(last_message) ->
-        tool_types =
-          last_message.tool_calls
-          |> Enum.group_by(&(&1.function.name == "write_project_experience"))
-
-        write_tools = Map.get(tool_types, true, [])
-        other_tools = Map.get(tool_types, false, [])
-
-        write_tool_results =
-          write_tools
-          |> Enum.map(fn %{id: id} ->
-            ReqLLM.Context.tool_result(id, "Succesfully updated project experience")
-          end)
-
-        new_project_experience =
-          write_tools
-          |> Enum.map(fn %{function: function} ->
-            %{"section" => section, "value" => value} = Jason.decode!(function.arguments)
-            {String.to_atom(section), value}
-          end)
-          |> Enum.into(%{})
-          |> then(&struct(state.project_experience, &1))
-
-        other_tool_results =
-          other_tools
+        tool_call_executions =
+          last_message
+          |> Map.get(:tool_calls, [])
           |> Enum.map(fn %{id: id, function: function} ->
             tool = Enum.find(LLM.setup_tools(), fn t -> t.name == function.name end)
-            {:ok, result} = ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments))
-            ReqLLM.Context.tool_result(id, result)
+
+            {:ok, result} =
+              ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments, keys: :atoms))
+
+            {id, result}
           end)
 
-        context =
-          state.context
-          |> ReqLLM.Context.append(write_tool_results)
-          |> ReqLLM.Context.append(other_tool_results)
+        tool_call_results =
+          tool_call_executions
+          |> Enum.map(fn {id, result} ->
+            response =
+              case result do
+                response when is_binary(response) -> response
+                {:set_state, response, _} -> response
+              end
+
+            ReqLLM.Context.tool_result(id, response)
+          end)
+
+        context = ReqLLM.Context.append(state.context, tool_call_results)
+
+        new_project_experience =
+          tool_call_executions
+          |> Enum.filter(&is_set_state_result?(&1))
+          |> Enum.reduce(
+            state,
+            fn {:set_state, _response, state_updator}, acc ->
+              state_updator.(acc)
+            end
+          )
+          |> Enum.into(%{})
+          |> then(&struct(state.project_experience, &1))
 
         response = call_llm(state |> Map.put(:context, context))
 
@@ -153,6 +156,10 @@ defmodule ItMinds.CvAgent.AgentInstance do
   end
 
   defp has_tool_call?(_message), do: false
+
+  @spec is_set_state_result?(LLM.tool_response()) :: boolean()
+  defp is_set_state_result?({:ok, {:set_state, _response, _state_updator}}), do: true
+  defp is_set_state_result?(_tool_call_execution), do: false
 
   @spec subscribe(String.t(), module()) :: :ok
   def subscribe(name, agent_module) do

@@ -15,6 +15,10 @@ defmodule ItMinds.CvAgent.LLM do
     ])
   end
 
+  @type tool_response ::
+          {:ok, response :: String.t()}
+          | {:ok, {:set_state, response :: String.t(), state_updator :: fun()}}
+
   @assistant_system_prompt File.read!("lib/itm_cv_agent/llm/main-assistant.md")
 
   @skill_01_basis_information_prompt File.read!(
@@ -79,7 +83,10 @@ defmodule ItMinds.CvAgent.LLM do
         ]
       ],
       # callback is not actually used as it is specially handled in agent_instance
-      callback: fn _args -> nil end
+      callback: fn %{section: section, value: value} ->
+        state_updator = &Map.put(&1, section, value)
+        {:set_state, "Succesfully updated project experience", state_updator}
+      end
     )
   end
 
