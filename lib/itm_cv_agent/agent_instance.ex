@@ -72,7 +72,9 @@ defmodule ItMinds.CvAgent.AgentInstance do
           |> Map.get(:tool_calls, [])
           |> Enum.map(fn %{id: id, function: function} ->
             tool =
-              Enum.find(state.agent_module.setup_tools(), fn t -> t.name == function.name end)
+              Enum.find(state.agent_module.setup_tools(state.agent_state), fn t ->
+                t.name == function.name
+              end)
 
             {:ok, result} =
               ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments, keys: :atoms))
@@ -122,7 +124,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
       ReqLLM.stream_text(
         state.agent_module.model(),
         state.context,
-        tools: state.agent_module.setup_tools()
+        tools: state.agent_module.setup_tools(state.agent_state)
       )
 
     {:ok, response} =

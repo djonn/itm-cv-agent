@@ -2,6 +2,9 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
   alias ReqLLM.{Context, Tool}
   alias ItMinds.CvAgent.ProjectExperience
 
+  @behaviour ItMinds.CvAgent.Agents.Behaviour
+
+  @impl ItMinds.CvAgent.Agents.Behaviour
   def model() do
     ReqLLM.model!(%{
       provider: :openai,
@@ -10,19 +13,24 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     })
   end
 
+  @impl ItMinds.CvAgent.Agents.Behaviour
   def new_context() do
     Context.new([
       Context.system(assistant_system_prompt())
     ])
   end
 
+  @impl ItMinds.CvAgent.Agents.Behaviour
   def new_state() do
     %ProjectExperience{}
   end
 
-  @type tool_response ::
-          {:ok, response :: String.t()}
-          | {:ok, {:set_state, response :: String.t(), state_updator :: fun()}}
+  @impl ItMinds.CvAgent.Agents.Behaviour
+  def setup_tools(_state) do
+    [
+      write_project_experience_tool()
+    ] ++ interview_steps_skills()
+  end
 
   @assistant_system_prompt File.read!("lib/itm_cv_agent/llm/main-assistant.md")
 
@@ -43,14 +51,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
                                          "lib/itm_cv_agent/llm/skill-06-english-translation.md"
                                        )
 
-  def assistant_system_prompt(), do: @assistant_system_prompt
-
-  @spec setup_tools() :: list(ReqLLM.Tool.t())
-  def setup_tools() do
-    [
-      write_project_experience_tool()
-    ] ++ interview_steps_skills()
-  end
+  defp assistant_system_prompt(), do: @assistant_system_prompt
 
   @spec write_project_experience_tool() :: ReqLLM.Tool.t()
   defp write_project_experience_tool() do
