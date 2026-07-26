@@ -16,7 +16,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
   @impl ItMinds.CvAgent.Agents.Behaviour
   def new_context() do
     Context.new([
-      Context.system(assistant_system_prompt())
+      Context.system(interviewer_system_prompt())
     ])
   end
 
@@ -33,7 +33,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     ] ++ interview_steps_skills()
   end
 
-  @assistant_system_prompt File.read!("lib/itm_cv_agent/llm/main-assistant.md")
+  @interviewer_system_prompt File.read!("lib/itm_cv_agent/llm/interviewer-agent.md")
 
   @skill_01_basis_information_prompt File.read!(
                                        "lib/itm_cv_agent/llm/skill-01-basis-information.md"
@@ -52,7 +52,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
                                          "lib/itm_cv_agent/llm/skill-06-english-translation.md"
                                        )
 
-  defp assistant_system_prompt(), do: @assistant_system_prompt
+  defp interviewer_system_prompt(), do: @interviewer_system_prompt
 
   @spec write_project_experience_tool() :: ReqLLM.Tool.t()
   defp write_project_experience_tool() do
