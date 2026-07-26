@@ -1,4 +1,4 @@
-defmodule ItMinds.CvAgent.LLM do
+defmodule ItMinds.CvAgent.Agents.Interviewer do
   alias ReqLLM.{Context, Tool}
   alias ItMinds.CvAgent.ProjectExperience
 
