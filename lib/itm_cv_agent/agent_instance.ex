@@ -76,7 +76,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
                 t.name == function.name
               end)
 
-            {:ok, result} =
+            result =
               ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments, keys: :atoms))
 
             {id, result}
@@ -87,7 +87,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
           |> Enum.map(fn {id, result} ->
             response =
               case result do
-                response when is_binary(response) -> response
+                {:ok, response} when is_binary(response) -> response
                 {:set_state, response, _} -> response
               end
 
@@ -101,7 +101,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
           |> Enum.filter(&is_set_state_result?(&1))
           |> Enum.reduce(
             state.agent_state,
-            fn {:set_state, _response, state_updator}, acc ->
+            fn {_tool_call_id, {:set_state, _response, state_updator}}, acc ->
               state_updator.(acc)
             end
           )
@@ -150,8 +150,8 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
   defp has_tool_call?(_message), do: false
 
-  @spec is_set_state_result?(ItMinds.CvAgent.LLM.tool_response()) :: boolean()
-  defp is_set_state_result?({:ok, {:set_state, _response, _state_updator}}), do: true
+  @spec is_set_state_result?(ItMinds.CvAgent.Agents.Behaviour.tool_response()) :: boolean()
+  defp is_set_state_result?({_tool_call_id, {:set_state, _response, _state_updator}}), do: true
   defp is_set_state_result?(_tool_call_execution), do: false
 
   @spec subscribe(String.t(), module()) :: :ok

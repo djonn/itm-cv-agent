@@ -63,15 +63,15 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
           type:
             {:in,
              [
-               :customer_name,
-               :project_name,
-               :project_description,
-               :employee_role_name,
-               :employee_role_description,
-               :competencies,
-               :start_date,
-               :end_date,
-               :employee_name
+               "customer_name",
+               "project_name",
+               "project_description",
+               "employee_role_name",
+               "employee_role_description",
+               "competencies",
+               "start_date",
+               "end_date",
+               "employee_name"
              ]},
           required: true,
           doc: "What section to write to"
@@ -79,7 +79,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
         language: [
           type: {:in, ["da", "en"]},
           required: false,
-          default: :da,
+          default: "da",
           doc: "Write default danish file or english translation"
         ],
         value: [
