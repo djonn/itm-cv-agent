@@ -1,7 +1,11 @@
 defmodule ItMinds.CvAgent.AgentSupervisor do
   use DynamicSupervisor
 
+  alias ItMinds.CvAgent.AgentInstance
+
   @supervisor_name :agents
+
+  @type instance_id :: {agent_module :: module(), name :: String.t()}
 
   def start_link(_init_arg) do
     DynamicSupervisor.start_link(__MODULE__, nil, name: __MODULE__)
@@ -14,21 +18,30 @@ defmodule ItMinds.CvAgent.AgentSupervisor do
   end
 
   def ensure_started(name, agent_module) do
-    case start_server(name, agent_module) do
+    instance_id = instance_id(name, agent_module)
+    ensure_started(instance_id)
+  end
+
+  def ensure_started(instance_id) do
+    case start_server(instance_id) do
       {:ok, pid} -> {:ok, pid}
       {:error, {:already_started, pid}} -> {:ok, pid}
       other -> other
     end
   end
 
-  @spec start_server(String.t(), module()) :: DynamicSupervisor.on_start_child()
   def start_server(name, agent_module) do
     instance_id = instance_id(name, agent_module)
-    via_name = via_syn(name, agent_module)
+    start_server(instance_id)
+  end
+
+  @spec start_server(instance_id()) :: DynamicSupervisor.on_start_child()
+  def start_server(instance_id) do
+    via_name = via_syn(instance_id)
 
     child_spec = %{
-      id: agent_module,
-      start: {agent_module, :start_link, [instance_id, [name: via_name]]}
+      id: AgentInstance,
+      start: {AgentInstance, :start_link, [instance_id, [name: via_name]]}
     }
 
     DynamicSupervisor.start_child(
@@ -38,22 +51,32 @@ defmodule ItMinds.CvAgent.AgentSupervisor do
   end
 
   def find_server(name, agent_module) do
+    instance_id = instance_id(name, agent_module)
+    find_server(instance_id)
+  end
+
+  def find_server(instance_id) do
     {pid, _metadata} =
       :syn.lookup(
         @supervisor_name,
-        instance_id(name, agent_module)
+        instance_id
       )
 
     pid
   end
 
   def stop_server(name, agent_module) do
-    via_syn(name, agent_module)
+    instance_id = instance_id(name, agent_module)
+    stop_server(instance_id)
+  end
+
+  def stop_server(instance_id) do
+    via_syn(instance_id)
     |> GenServer.stop(:normal, 5000)
   end
 
   def instance_id(name, agent_module), do: {agent_module, name}
 
-  def via_syn(name, agent_module),
-    do: {:via, :syn, {@supervisor_name, instance_id(name, agent_module)}}
+  def via_syn(instance_id),
+    do: {:via, :syn, {@supervisor_name, instance_id}}
 end

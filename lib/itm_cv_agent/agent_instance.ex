@@ -4,25 +4,17 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
   alias Phoenix.PubSub
 
-  alias ItMinds.CvAgent.LLM
-  alias ItMinds.CvAgent.ProjectExperience
   alias ItMinds.CvAgent.AgentSupervisor
 
-  defstruct [:instance_id, :phase, :context, :project_experience]
+  defstruct [:instance_id, :context, :agent_module, :agent_state]
 
   @type instance_id_t :: {module(), String.t()}
 
   @type t :: %__MODULE__{
           instance_id: instance_id_t(),
-          phase:
-            :setup
-            | :customer_interview
-            | :developer_role_interview
-            | :review
-            | :competency_matching
-            | :translation,
           context: ReqLLM.Context.t(),
-          project_experience: ProjectExperience.t()
+          agent_module: module(),
+          agent_state: term()
         }
 
   # Public
@@ -30,24 +22,24 @@ defmodule ItMinds.CvAgent.AgentInstance do
     GenServer.start_link(__MODULE__, instance_id, opts)
   end
 
-  def send_prompt(name, message) do
-    AgentSupervisor.find_server(name, __MODULE__)
+  def send_prompt(name, agent_module, message) do
+    AgentSupervisor.find_server(name, agent_module)
     |> GenServer.cast({:prompt, message})
   end
 
-  def get_state(name) do
-    AgentSupervisor.find_server(name, __MODULE__)
+  def get_state(name, agent_module) do
+    AgentSupervisor.find_server(name, agent_module)
     |> GenServer.call(:get_state)
   end
 
   # Private
-  def init(instance_id) do
+  def init({agent_module, _name} = instance_id) do
     {:ok,
      %__MODULE__{
        instance_id: instance_id,
-       phase: :setup,
-       context: LLM.new_context(),
-       project_experience: %ProjectExperience{}
+       context: agent_module.new_context(),
+       agent_module: agent_module,
+       agent_state: agent_module.new_state()
      }}
   end
 
@@ -79,7 +71,8 @@ defmodule ItMinds.CvAgent.AgentInstance do
           last_message
           |> Map.get(:tool_calls, [])
           |> Enum.map(fn %{id: id, function: function} ->
-            tool = Enum.find(LLM.setup_tools(), fn t -> t.name == function.name end)
+            tool =
+              Enum.find(state.agent_module.setup_tools(), fn t -> t.name == function.name end)
 
             {:ok, result} =
               ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments, keys: :atoms))
@@ -101,24 +94,22 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
         context = ReqLLM.Context.append(state.context, tool_call_results)
 
-        new_project_experience =
+        new_agent_state =
           tool_call_executions
           |> Enum.filter(&is_set_state_result?(&1))
           |> Enum.reduce(
-            state,
+            state.agent_state,
             fn {:set_state, _response, state_updator}, acc ->
               state_updator.(acc)
             end
           )
-          |> Enum.into(%{})
-          |> then(&struct(state.project_experience, &1))
 
         response = call_llm(state |> Map.put(:context, context))
 
         handle_llm(
           state
           |> Map.put(:context, response.context)
-          |> Map.put(:project_experience, new_project_experience)
+          |> Map.put(:agent_state, new_agent_state)
         )
 
       true ->
@@ -129,9 +120,9 @@ defmodule ItMinds.CvAgent.AgentInstance do
   defp call_llm(state) do
     {:ok, stream_response} =
       ReqLLM.stream_text(
-        LLM.model(),
+        state.agent_module.model(),
         state.context,
-        tools: LLM.setup_tools()
+        tools: state.agent_module.setup_tools()
       )
 
     {:ok, response} =
@@ -157,7 +148,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
   defp has_tool_call?(_message), do: false
 
-  @spec is_set_state_result?(LLM.tool_response()) :: boolean()
+  @spec is_set_state_result?(ItMinds.CvAgent.LLM.tool_response()) :: boolean()
   defp is_set_state_result?({:ok, {:set_state, _response, _state_updator}}), do: true
   defp is_set_state_result?(_tool_call_execution), do: false
 

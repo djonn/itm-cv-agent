@@ -1,5 +1,6 @@
 defmodule ItMinds.CvAgent.LLM do
   alias ReqLLM.{Context, Tool}
+  alias ItMinds.CvAgent.ProjectExperience
 
   def model() do
     ReqLLM.model!(%{
@@ -13,6 +14,10 @@ defmodule ItMinds.CvAgent.LLM do
     Context.new([
       Context.system(assistant_system_prompt())
     ])
+  end
+
+  def new_state() do
+    %ProjectExperience{}
   end
 
   @type tool_response ::

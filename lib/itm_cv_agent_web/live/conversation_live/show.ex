@@ -2,6 +2,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   use ItMinds.CvAgentWeb, :live_view
 
   alias ItMinds.CvAgent.{AgentInstance, AgentSupervisor, Conversations}
+  alias ItMinds.CvAgent.LLM
   alias ItMinds.CvAgentWeb.Markdown
 
   @impl Phoenix.LiveView
@@ -137,7 +138,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
 
   @impl Phoenix.LiveView
   def handle_event("send", %{"message" => message}, socket) do
-    :ok = AgentInstance.send_prompt(socket.assigns.conversation.id, message)
+    :ok = AgentInstance.send_prompt(socket.assigns.conversation.id, LLM, message)
 
     new_messages =
       socket.assigns.messages ++
@@ -201,9 +202,9 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   @impl Phoenix.LiveView
   def mount(%{"id" => id}, _session, socket) do
     conversation = Conversations.get_conversation!(id)
-    AgentSupervisor.ensure_started(conversation.id, AgentInstance)
-    {:ok, state} = AgentInstance.get_state(conversation.id)
-    AgentInstance.subscribe(conversation.id, AgentInstance)
+    AgentSupervisor.ensure_started(conversation.id, LLM)
+    {:ok, state} = AgentInstance.get_state(conversation.id, LLM)
+    AgentInstance.subscribe(conversation.id, LLM)
 
     messages = context_to_message(state.context)
 
