@@ -188,8 +188,14 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   end
 
   defp format_message(message, index) do
-    text_part = message.content |> Enum.find(fn part -> part.type == :text end)
-    %{type: message.role, message: text_part.text, key: index}
+    try do
+      text_part = message.content |> Enum.find(fn part -> part.type == :text end)
+      %{type: message.role, message: text_part.text, key: index}
+    rescue
+      _ ->
+        # this was some thinking before calling tools and doesnt have any content to show the user
+        nil
+    end
   end
 
   @impl Phoenix.LiveView
