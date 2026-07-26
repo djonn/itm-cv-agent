@@ -27,6 +27,11 @@ defmodule ItMinds.CvAgent.AgentInstance do
     |> GenServer.cast({:prompt, message})
   end
 
+  def send_prompt_sync(name, agent_module, message) do
+    AgentSupervisor.find_server(name, agent_module)
+    |> GenServer.call({:prompt, message})
+  end
+
   def get_state(name, agent_module) do
     AgentSupervisor.find_server(name, agent_module)
     |> GenServer.call(:get_state)
@@ -47,6 +52,22 @@ defmodule ItMinds.CvAgent.AgentInstance do
     {:reply, {:ok, state}, state}
   end
 
+  def handle_call({:prompt, message}, _from, state) do
+    context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
+    state = state |> Map.put(:context, context)
+    new_state = handle_llm(state)
+
+    response =
+      new_state.context.messages
+      |> List.last()
+      |> then(& &1.content)
+      |> Enum.find(fn part -> part.type == :text end)
+      |> then(& &1.text)
+
+    {:reply, response, new_state}
+  end
+
+  # Cast means it is not awaited, while Call is syncronous
   def handle_cast({:prompt, message}, state) do
     context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
     state = state |> Map.put(:context, context)

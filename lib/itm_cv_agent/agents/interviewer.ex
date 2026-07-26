@@ -1,6 +1,6 @@
 defmodule ItMinds.CvAgent.Agents.Interviewer do
   alias ReqLLM.{Context, Tool}
-  alias ItMinds.CvAgent.ProjectExperience
+  alias ItMinds.CvAgent.{AgentInstance, AgentSupervisor, ProjectExperience}
 
   @behaviour ItMinds.CvAgent.Agents.Behaviour
 
@@ -28,7 +28,8 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
   @impl ItMinds.CvAgent.Agents.Behaviour
   def setup_tools(_state) do
     [
-      write_project_experience_tool()
+      write_project_experience_tool(),
+      subagent_tool()
     ] ++ interview_steps_skills()
   end
 
@@ -112,5 +113,31 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
         callback: fn _args -> {:ok, prompt} end
       )
     end)
+  end
+
+  defp subagent_tool() do
+    Tool.new!(
+      name: "Task",
+      description: "Interact with a subagent",
+      parameter_schema: [
+        agent: [
+          type: {:in, ["translator"]},
+          required: true,
+          doc: "The subagent to call upon"
+        ],
+        message: [
+          type: :string,
+          required: true,
+          doc:
+            "The message to call the subagent with. Any previous calls to the same subagent with remain in their context."
+        ]
+      ],
+      # callback is not actually used as it is specially handled in agent_instance
+      callback: fn %{agent: _agent, message: message} ->
+        AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Translator)
+        response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Translator, message)
+        {:ok, response}
+      end
+    )
   end
 end
