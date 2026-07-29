@@ -26,12 +26,12 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
   end
 
   @impl ItMinds.CvAgent.Agents.Behaviour
-  def setup_tools(_state) do
+  def setup_tools(state) do
     [
       write_project_experience_tool(),
       translator_agent_tool(),
       reviewer_agent_tool(),
-      competency_matcher_agent_tool()
+      competency_matcher_agent_tool(state)
     ]
   end
 
@@ -133,5 +133,58 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
         {:ok, response}
       end
     )
+  end
+
+  defp competency_matcher_agent_tool(state) do
+    Tool.new!(
+      name: "match_competencies",
+      description: "Extract a list of competencies from the project experience",
+      parameter_schema: [],
+      callback: fn %{} ->
+        AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.CompetencyMatcher)
+
+        _response =
+          AgentInstance.send_prompt_sync(
+            "1",
+            ItMinds.CvAgent.Agents.CompetencyMatcher,
+            format_project_experience(state)
+          )
+
+        competencies = AgentInstance.get_state("1", ItMinds.CvAgent.Agents.CompetencyMatcher)
+
+        case competencies do
+          c when is_list(c) ->
+            state_updator = &Map.put(&1, :competencies, c)
+            {:set_state, "Succesfully matched competencies", state_updator}
+
+          _ ->
+            {:ok, "Extracting competencies failed"}
+        end
+      end
+    )
+  end
+
+  defp format_project_experience(%ProjectExperience{} = p) do
+    """
+    <project-experience>
+    # Projekterfaring
+
+    Start dato (måned/år): #{p.start_date}
+    Slut dato (måned/år): #{p.end_date}
+
+    ## Kunde
+
+    Kundenavn: #{p.customer_name}
+    Projektnavn: #{p.project_name}
+
+    #{p.project_description}
+
+    ## Udviklerens rolle
+
+    Navn på rolle: #{p.employee_role_name}
+
+    #{p.employee_role_description}
+    </project-experience>
+    """
   end
 end
