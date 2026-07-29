@@ -29,7 +29,9 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
   def setup_tools(_state) do
     [
       write_project_experience_tool(),
-      subagent_tool()
+      translator_agent_tool(),
+      reviewer_agent_tool(),
+      competency_matcher_agent_tool()
     ]
   end
 
@@ -86,7 +88,6 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
           doc: "The new content of the section, everything in the section will be overridden"
         ]
       ],
-      # callback is not actually used as it is specially handled in agent_instance
       callback: fn %{section: section, value: value} ->
         state_updator = &Map.put(&1, section, value)
         {:set_state, "Succesfully updated project experience", state_updator}
@@ -94,21 +95,16 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     )
   end
 
-  defp subagent_tool() do
+  defp translator_agent_tool() do
     Tool.new!(
-      name: "Task",
-      description: "Interact with a subagent",
+      name: "Task[translator]",
+      description: "Interact with a translator subagent",
       parameter_schema: [
-        agent: [
-          type: {:in, ["translator"]},
-          required: true,
-          doc: "The subagent to call upon"
-        ],
         message: [
           type: :string,
           required: true,
           doc:
-            "The message to call the subagent with. Any previous calls to the same subagent with remain in their context."
+            "The message to call the translator with. Any previous calls to the translator with remain in their context."
         ]
       ],
       callback: fn %{message: message} ->
