@@ -108,6 +108,9 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
         ]
       ],
       callback: fn %{message: message} ->
+        # TODO: Pass the project experience to the subagent so it can access it with a tool
+        # TODO: Get the english translation from the subagent and update the interviewer agent
+
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Translator)
         response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Translator, message)
         {:ok, response}
@@ -130,6 +133,9 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
       callback: fn %{message: message} ->
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Reviewer)
         response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Reviewer, message)
+
+        # TODO: Pass the project experience to the subagent as structured data
+
         {:ok, response}
       end
     )
