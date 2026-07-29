@@ -114,4 +114,24 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
       end
     )
   end
+
+  defp reviewer_agent_tool() do
+    Tool.new!(
+      name: "Task[reviewer]",
+      description: "Interact with a reviewer subagent",
+      parameter_schema: [
+        message: [
+          type: :string,
+          required: true,
+          doc:
+            "The message to call the reviewer with. Any previous calls to the reviewer with remain in their context."
+        ]
+      ],
+      callback: fn %{message: message} ->
+        AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Reviewer)
+        response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Reviewer, message)
+        {:ok, response}
+      end
+    )
+  end
 end
