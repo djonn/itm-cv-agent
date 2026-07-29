@@ -52,7 +52,21 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
                                          "lib/itm_cv_agent/llm/skill-06-english-translation.md"
                                        )
 
-  defp interviewer_system_prompt(), do: @interviewer_system_prompt
+  defp interviewer_system_prompt() do
+    [
+      @interviewer_system_prompt,
+      env_prompt()
+    ]
+    |> Enum.map(&String.trim(&1))
+    |> Enum.join("\n\n---\n\n")
+  end
+
+  defp env_prompt(),
+    do: """
+    <env>
+      Today's date: #{Date.utc_today() |> DateExtension.to_string()}
+    </env>
+    """
 
   @spec write_project_experience_tool() :: ReqLLM.Tool.t()
   defp write_project_experience_tool() do
