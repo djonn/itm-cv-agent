@@ -30,27 +30,10 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     [
       write_project_experience_tool(),
       subagent_tool()
-    ] ++ interview_steps_skills()
+    ]
   end
 
   @interviewer_system_prompt File.read!("lib/itm_cv_agent/llm/interviewer-agent.md")
-
-  @skill_01_basis_information_prompt File.read!(
-                                       "lib/itm_cv_agent/llm/skill-01-basis-information.md"
-                                     )
-  @skill_02_customer_interview_prompt File.read!(
-                                        "lib/itm_cv_agent/llm/skill-02-customer-interview.md"
-                                      )
-  @skill_03_developer_role_interview_prompt File.read!(
-                                              "lib/itm_cv_agent/llm/skill-03-developer-role-interview.md"
-                                            )
-  @skill_04_review_prompt File.read!("lib/itm_cv_agent/llm/skill-04-review.md")
-  @skill_05_match_competencies_prompt File.read!(
-                                        "lib/itm_cv_agent/llm/skill-05-match-competencies.md"
-                                      )
-  @skill_06_english_translation_prompt File.read!(
-                                         "lib/itm_cv_agent/llm/skill-06-english-translation.md"
-                                       )
 
   defp interviewer_system_prompt() do
     [
@@ -111,24 +94,6 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     )
   end
 
-  defp interview_steps_skills() do
-    [
-      {"s01_basis_information", @skill_01_basis_information_prompt},
-      {"s02_customer_interview", @skill_02_customer_interview_prompt},
-      {"s03_developer_role_interview", @skill_03_developer_role_interview_prompt},
-      {"s04_review", @skill_04_review_prompt},
-      {"s05_match_competencies", @skill_05_match_competencies_prompt},
-      {"s06_english_translation", @skill_06_english_translation_prompt}
-    ]
-    |> Enum.map(fn {name, prompt} ->
-      Tool.new!(
-        name: name,
-        description: "Brug når Interview struktur siger du skal",
-        callback: fn _args -> {:ok, prompt} end
-      )
-    end)
-  end
-
   defp subagent_tool() do
     Tool.new!(
       name: "Task",
@@ -146,8 +111,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
             "The message to call the subagent with. Any previous calls to the same subagent with remain in their context."
         ]
       ],
-      # callback is not actually used as it is specially handled in agent_instance
-      callback: fn %{agent: _agent, message: message} ->
+      callback: fn %{message: message} ->
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Translator)
         response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Translator, message)
         {:ok, response}
