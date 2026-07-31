@@ -26,12 +26,12 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
   end
 
   @impl ItMinds.CvAgent.Agents.Behaviour
-  def setup_tools(state) do
+  def setup_tools(_state) do
     [
       write_project_experience_tool(),
-      translator_agent_tool(),
       reviewer_agent_tool(),
-      competency_matcher_agent_tool(state)
+      translator_agent_tool(),
+      competency_matcher_agent_tool()
     ]
   end
 
@@ -141,12 +141,12 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     )
   end
 
-  defp competency_matcher_agent_tool(state) do
+  defp competency_matcher_agent_tool() do
     Tool.new!(
       name: "match_competencies",
       description: "Extract a list of competencies from the project experience",
       parameter_schema: [],
-      callback: fn %{} ->
+      callback: fn %{state: state} ->
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.CompetencyMatcher)
 
         _response =

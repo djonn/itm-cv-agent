@@ -5,6 +5,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
   alias Phoenix.PubSub
 
   alias ItMinds.CvAgent.AgentSupervisor
+  alias ReqLLM.Tool
 
   defstruct [:instance_id, :context, :agent_module, :agent_state]
 
@@ -97,8 +98,14 @@ defmodule ItMinds.CvAgent.AgentInstance do
                 t.name == function.name
               end)
 
+            tool_with_state = add_state_to_tool_parameters(tool)
+
             result =
-              ReqLLM.Tool.execute(tool, Jason.decode!(function.arguments, keys: :atoms))
+              ReqLLM.Tool.execute(
+                tool_with_state,
+                Jason.decode!(function.arguments, keys: :atoms)
+                |> Map.put(:state, state.agent_state)
+              )
 
             {id, result}
           end)
@@ -108,8 +115,21 @@ defmodule ItMinds.CvAgent.AgentInstance do
           |> Enum.map(fn {id, result} ->
             response =
               case result do
-                {:ok, response} when is_binary(response) -> response
-                {:set_state, response, _} -> response
+                {:ok, response} when is_binary(response) ->
+                  response
+
+                {:ok, nil} ->
+                  "<empty-response/>"
+
+                {:set_state, response, _} ->
+                  response
+
+                {:error, %ReqLLM.Error.Validation.Error{reason: reason}} ->
+                  # In case of callback validation error, just tell the agent what the error was
+                  reason
+
+                {:error, error} ->
+                  raise error
               end
 
             ReqLLM.Context.tool_result(id, response)
@@ -174,6 +194,19 @@ defmodule ItMinds.CvAgent.AgentInstance do
   @spec is_set_state_result?(ItMinds.CvAgent.Agents.Behaviour.tool_response()) :: boolean()
   defp is_set_state_result?({_tool_call_id, {:set_state, _response, _state_updator}}), do: true
   defp is_set_state_result?(_tool_call_execution), do: false
+
+  defp add_state_to_tool_parameters(%Tool{} = tool) do
+    parameter_schema = Map.get(tool, :parameter_schema, []) ++ [state: [type: :any]]
+
+    Tool.new!(
+      name: tool.name,
+      description: tool.description,
+      parameter_schema: parameter_schema,
+      callback: tool.callback,
+      strict: Map.get(tool, :strict, false),
+      provider_options: Map.get(tool, :provider_options, %{})
+    )
+  end
 
   @spec subscribe(String.t(), module()) :: :ok
   def subscribe(name, agent_module) do
