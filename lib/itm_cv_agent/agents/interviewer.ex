@@ -163,7 +163,8 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
             format_project_experience(state)
           )
 
-        competencies = AgentInstance.get_state("1", ItMinds.CvAgent.Agents.CompetencyMatcher)
+        {:ok, competencies} =
+          AgentInstance.get_agent_state("1", ItMinds.CvAgent.Agents.CompetencyMatcher)
 
         case competencies do
           c when is_list(c) ->
