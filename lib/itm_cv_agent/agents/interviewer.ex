@@ -99,19 +99,34 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     Tool.new!(
       name: "translate",
       description: "Translate the project experience from danish to english.",
-      parameter_schema: [
-        message: [
-          type: :string,
-          required: true,
-          doc:
-            "The message to call the translator with. Any previous calls to the translator with remain in their context."
-        ]
-      ],
-      callback: fn %{message: message} ->
-        # TODO: Pass the project experience to the subagent so it can access it with a tool
-        # TODO: Get the english translation from the subagent and update the interviewer agent
+      parameter_schema: [],
+      callback: fn %{state: state} ->
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Translator)
-        response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Translator, message)
+
+        initial_translator_state =
+          AgentInstance.get_agent_state("1", ItMinds.CvAgent.Agents.Translator)
+          |> elem(1)
+          |> Map.put("da", state)
+
+        {:ok, _} =
+          AgentInstance.set_agent_state(
+            "1",
+            ItMinds.CvAgent.Agents.Translator,
+            initial_translator_state
+          )
+
+        response =
+          AgentInstance.send_prompt_sync(
+            "1",
+            ItMinds.CvAgent.Agents.Translator,
+            "Go ahead and translate"
+          )
+
+        # TODO: persist this somehow
+        _translated =
+          AgentInstance.get_agent_state("1", ItMinds.CvAgent.Agents.Translator)
+          |> elem(1)
+          |> Map.get("en")
 
         {:ok, response}
       end

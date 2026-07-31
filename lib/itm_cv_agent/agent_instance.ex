@@ -38,6 +38,21 @@ defmodule ItMinds.CvAgent.AgentInstance do
     |> GenServer.call(:get_state)
   end
 
+  def set_state(name, agent_module, new_state) do
+    AgentSupervisor.find_server(name, agent_module)
+    |> GenServer.call({:set_state, new_state})
+  end
+
+  def get_agent_state(name, agent_module) do
+    AgentSupervisor.find_server(name, agent_module)
+    |> GenServer.call(:get_agent_state)
+  end
+
+  def set_agent_state(name, agent_module, new_agent_state) do
+    AgentSupervisor.find_server(name, agent_module)
+    |> GenServer.call({:set_agent_state, new_agent_state})
+  end
+
   # Private
   def init({agent_module, _name} = instance_id) do
     {:ok,
@@ -51,6 +66,19 @@ defmodule ItMinds.CvAgent.AgentInstance do
 
   def handle_call(:get_state, _from, state) do
     {:reply, {:ok, state}, state}
+  end
+
+  def handle_call({:set_state, new_state}, _from, _old_state) do
+    {:reply, {:ok, new_state}, new_state}
+  end
+
+  def handle_call(:get_agent_state, _from, state) do
+    {:reply, {:ok, state |> Map.get(:agent_state)}, state}
+  end
+
+  def handle_call({:set_agent_state, new_agent_state}, _from, old_state) do
+    new_state = old_state |> Map.put(:agent_state, new_agent_state)
+    {:reply, {:ok, new_agent_state}, new_state}
   end
 
   def handle_call({:prompt, message}, _from, state) do
