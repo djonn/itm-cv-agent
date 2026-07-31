@@ -97,8 +97,8 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
 
   defp translator_agent_tool() do
     Tool.new!(
-      name: "Task[translator]",
-      description: "Interact with a translator subagent",
+      name: "translate",
+      description: "Translate the project experience from danish to english.",
       parameter_schema: [
         message: [
           type: :string,
@@ -110,9 +110,9 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
       callback: fn %{message: message} ->
         # TODO: Pass the project experience to the subagent so it can access it with a tool
         # TODO: Get the english translation from the subagent and update the interviewer agent
-
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Translator)
         response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Translator, message)
+
         {:ok, response}
       end
     )
@@ -120,7 +120,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
 
   defp reviewer_agent_tool() do
     Tool.new!(
-      name: "Task[reviewer]",
+      name: "Task-reviewer",
       description: "Interact with a reviewer subagent",
       parameter_schema: [
         message: [
