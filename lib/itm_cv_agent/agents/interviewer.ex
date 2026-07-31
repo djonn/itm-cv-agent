@@ -122,19 +122,16 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
     Tool.new!(
       name: "Task-reviewer",
       description: "Interact with a reviewer subagent",
-      parameter_schema: [
-        message: [
-          type: :string,
-          required: true,
-          doc:
-            "The message to call the reviewer with. Any previous calls to the reviewer with remain in their context."
-        ]
-      ],
-      callback: fn %{message: message} ->
+      parameter_schema: [],
+      callback: fn %{state: state} ->
         AgentSupervisor.ensure_started("1", ItMinds.CvAgent.Agents.Reviewer)
-        response = AgentInstance.send_prompt_sync("1", ItMinds.CvAgent.Agents.Reviewer, message)
 
-        # TODO: Pass the project experience to the subagent as structured data
+        response =
+          AgentInstance.send_prompt_sync(
+            "1",
+            ItMinds.CvAgent.Agents.Reviewer,
+            format_project_experience(state)
+          )
 
         {:ok, response}
       end
