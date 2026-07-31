@@ -113,7 +113,8 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
           AgentInstance.send_prompt_sync(
             "1",
             ItMinds.CvAgent.Agents.Translator,
-            "Go ahead and translate"
+            "Go ahead and translate",
+            120_000
           )
 
         # TODO: persist this somehow

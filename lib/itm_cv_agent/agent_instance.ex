@@ -28,9 +28,9 @@ defmodule ItMinds.CvAgent.AgentInstance do
     |> GenServer.cast({:prompt, message})
   end
 
-  def send_prompt_sync(name, agent_module, message) do
+  def send_prompt_sync(name, agent_module, message, timeout \\ 5000) do
     AgentSupervisor.find_server(name, agent_module)
-    |> GenServer.call({:prompt, message})
+    |> GenServer.call({:prompt, message}, timeout)
   end
 
   def get_state(name, agent_module) do
