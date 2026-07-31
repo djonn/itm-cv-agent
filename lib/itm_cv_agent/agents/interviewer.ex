@@ -68,19 +68,13 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
                "project_description",
                "employee_role_name",
                "employee_role_description",
-               "competencies",
+               #  "competencies",
                "start_date",
                "end_date",
                "employee_name"
              ]},
           required: true,
           doc: "What section to write to"
-        ],
-        language: [
-          type: {:in, ["da", "en"]},
-          required: false,
-          default: "da",
-          doc: "Write default danish file or english translation"
         ],
         value: [
           type: :string,
@@ -89,7 +83,7 @@ defmodule ItMinds.CvAgent.Agents.Interviewer do
         ]
       ],
       callback: fn %{section: section, value: value} ->
-        state_updator = &Map.put(&1, section, value)
+        state_updator = &Map.put(&1, section |> String.to_atom(), value)
         {:set_state, "Succesfully updated project experience", state_updator}
       end
     )
