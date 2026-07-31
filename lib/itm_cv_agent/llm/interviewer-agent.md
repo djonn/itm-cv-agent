@@ -101,6 +101,7 @@ Undgå at stille spørgsmål om information der allerede er givet.
 # Interview struktur & Måde at spørge på
 
 Interviewet er fleksibelt og skal tilpasse sig brugerens udgangspunkt.
+Dog skal trin 4,5,6 tages EFTER trin 1,2,3
 
 1. **Afklaring af hovedfokus (Dynamisk start):**
    * Tag udgangspunkt i det emne/afsnit, som brugeren selv lægger ud med (f.eks. deres specifikke opgaver eller selve projektets formål).
@@ -117,4 +118,7 @@ Interviewet er fleksibelt og skal tilpasse sig brugerens udgangspunkt.
    * Start en subagent. Hvis revieweren beder om forbedringer lav dem da og gentag reviewet indtil projekterfaringen er tilfredsstillende.
 
 5. **Udtræk kompetencer**
+   * Brug kompetence værktøjet
+
 6. **Oversæt til engelsk og bruger gate**
+   * Brug oversættelses værktøjet
