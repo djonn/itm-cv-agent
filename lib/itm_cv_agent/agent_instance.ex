@@ -7,7 +7,7 @@ defmodule ItMinds.CvAgent.AgentInstance do
   alias ItMinds.CvAgent.AgentSupervisor
   alias ReqLLM.Tool
 
-  defstruct [:instance_id, :context, :agent_module, :agent_state]
+  defstruct [:instance_id, :context, :agent_module, :agent_state, busy?: false]
 
   @type instance_id_t :: {module(), String.t()}
 
@@ -81,30 +81,41 @@ defmodule ItMinds.CvAgent.AgentInstance do
     {:reply, {:ok, new_agent_state}, new_state}
   end
 
-  def handle_call({:prompt, message}, _from, state) do
-    context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
-    state = state |> Map.put(:context, context)
-    new_state = handle_llm(state)
+  def handle_call({:prompt, message}, from, state) do
+    if state.busy? do
+      {:reply, {:error, :busy}, state}
+    else
+      context = ReqLLM.Context.append(state.context, ReqLLM.Context.user(message))
+      state = %{state | context: context}
 
-    response =
-      new_state.context.messages
-      |> List.last()
-      |> then(& &1.content)
-      |> Enum.find(fn part -> part.type == :text end)
-      |> then(& &1.text)
+      gen_server_pid = self()
 
-    {:reply, response, new_state}
+      Task.start(fn ->
+        result = handle_llm(state)
+        send(gen_server_pid, {:llm_done, result, from})
+      end)
+
+      {:noreply, %{state | busy?: true}}
+    end
   end
 
   # Cast means it is not awaited, while Call is syncronous
   def handle_cast({:prompt, message}, state) do
-    context = state.context |> ReqLLM.Context.append(ReqLLM.Context.user(message))
-    state = state |> Map.put(:context, context)
-    new_state = handle_llm(state)
+    if state.busy? do
+      {:noreply, state}
+    else
+      context = ReqLLM.Context.append(state.context, ReqLLM.Context.user(message))
+      state = %{state | context: context}
 
-    broadcast(state.instance_id, {:new_state, new_state})
+      gen_server_pid = self()
 
-    {:noreply, new_state}
+      Task.start(fn ->
+        result = handle_llm(state)
+        send(gen_server_pid, {:llm_done, result, nil})
+      end)
+
+      {:noreply, %{state | busy?: true}}
+    end
   end
 
   defp handle_llm(state) do
@@ -222,6 +233,25 @@ defmodule ItMinds.CvAgent.AgentInstance do
   @spec is_set_state_result?(ItMinds.CvAgent.Agents.Behaviour.tool_response()) :: boolean()
   defp is_set_state_result?({_tool_call_id, {:set_state, _response, _state_updator}}), do: true
   defp is_set_state_result?(_tool_call_execution), do: false
+
+  def handle_info({:llm_done, new_state, from}, state) do
+    broadcast(state.instance_id, {:new_state, new_state})
+
+    if from do
+      response = get_response_text(new_state)
+      GenServer.reply(from, response)
+    end
+
+    {:noreply, %{new_state | busy?: false}}
+  end
+
+  defp get_response_text(state) do
+    state.context.messages
+    |> List.last()
+    |> then(& &1.content)
+    |> Enum.find(fn part -> part.type == :text end)
+    |> then(& &1.text)
+  end
 
   defp add_state_to_tool_parameters(%Tool{} = tool) do
     parameter_schema = Map.get(tool, :parameter_schema, []) ++ [state: [type: :any]]

@@ -11,7 +11,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     <Layouts.app flash={@flash}>
       <div class="w-full h-[calc(100dvh-64px)] flex flex-col ">
         <.messages messages={@messages} loading={@loading} streaming_message={@streams.stream} />
-        <.chat_input form={@form} />
+        <.chat_input form={@form} loading={@loading} />
       </div>
     </Layouts.app>
     """
@@ -95,6 +95,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   end
 
   attr :form, :map, required: true
+  attr :loading, :boolean, default: false
 
   defp chat_input(assigns) do
     ~H"""
@@ -114,6 +115,10 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
               mounted() {
                 this.el.addEventListener("keydown", e => {
                   if (e.key == "Enter" && !e.shiftKey) {
+                    const submitButton = this.el.form.querySelector('button[type="submit"]')
+                    if (submitButton.disabled) {
+                      return
+                    }
                     e.preventDefault();
                     this.el.form.dispatchEvent(
                       new Event("submit", { bubbles: true, cancelable: true })
@@ -125,8 +130,13 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
           </script>
           <button
             type="submit"
-            class="flex flex-col justify-around pr-3 cursor-pointer"
+            class={[
+              "flex flex-col justify-around pr-3",
+              @loading && "opacity-50 cursor-not-allowed",
+              !@loading && "cursor-pointer"
+            ]}
             aria-label={gettext("close")}
+            disabled={@loading}
           >
             <.icon name="hero-paper-airplane" class="size-5" />
           </button>
@@ -138,19 +148,23 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
 
   @impl Phoenix.LiveView
   def handle_event("send", %{"message" => message}, socket) do
-    :ok = AgentInstance.send_prompt(socket.assigns.conversation.id, Interviewer, message)
+    if socket.assigns.loading do
+      {:noreply, socket}
+    else
+      AgentInstance.send_prompt(socket.assigns.conversation.id, Interviewer, message)
 
-    new_messages =
-      socket.assigns.messages ++
-        [%{type: :user, message: message, key: "latest_user_message"}]
+      new_messages =
+        socket.assigns.messages ++
+          [%{type: :user, message: message, key: "latest_user_message"}]
 
-    {
-      :noreply,
-      socket
-      |> assign(:loading, true)
-      |> assign(:form, to_form(%{"chat" => ""}))
-      |> assign(:messages, new_messages)
-    }
+      {
+        :noreply,
+        socket
+        |> assign(:loading, true)
+        |> assign(:form, to_form(%{"chat" => ""}))
+        |> assign(:messages, new_messages)
+      }
+    end
   end
 
   @impl Phoenix.LiveView
