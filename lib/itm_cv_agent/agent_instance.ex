@@ -204,7 +204,11 @@ defmodule ItMinds.CvAgent.AgentInstance do
       ReqLLM.stream_text(
         state.agent_module.model(),
         state.context,
-        tools: state.agent_module.setup_tools(state.agent_state)
+        tools: state.agent_module.setup_tools(state.agent_state),
+        temperature: 0.7,
+        presence_penalty: 0.5,
+        top_p: 0.9,
+        stop: ["I'll send it."]
       )
 
     {:ok, response} =
