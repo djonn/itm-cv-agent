@@ -10,14 +10,14 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
     <Layouts.app flash={@flash}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage conversation records in your database.</:subtitle>
+        <:subtitle>Administrér samtaler i din database.</:subtitle>
       </.header>
 
       <.form for={@form} id="conversation-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Name" />
-        <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Conversation</.button>
-          <.button navigate={return_path(@return_to, @conversation)}>Cancel</.button>
+        <.input field={@form[:name]} type="text" label="Navn" />
+        <footer class="mt-6 flex gap-4">
+          <.button phx-disable-with="Gemmer..." variant="primary">Gem samtale</.button>
+          <.button navigate={return_path(@return_to, @conversation)}>Annullér</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -39,7 +39,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
     conversation = Conversations.get_conversation!(id)
 
     socket
-    |> assign(:page_title, "Edit Conversation")
+    |> assign(:page_title, "Redigér samtale")
     |> assign(:conversation, conversation)
     |> assign(:form, to_form(Conversations.change_conversation(conversation)))
   end
@@ -48,7 +48,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
     conversation = %Conversation{}
 
     socket
-    |> assign(:page_title, "New Conversation")
+    |> assign(:page_title, "Ny samtale")
     |> assign(:conversation, conversation)
     |> assign(:form, to_form(Conversations.change_conversation(conversation)))
   end
@@ -70,7 +70,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
       {:ok, conversation} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Conversation updated successfully")
+         |> put_flash(:info, "Samtale opdateret")
          |> push_navigate(to: return_path(socket.assigns.return_to, conversation))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -83,7 +83,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
       {:ok, conversation} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Conversation created successfully")
+         |> put_flash(:info, "Samtale oprettet")
          |> push_navigate(to: return_path(socket.assigns.return_to, conversation))}
 
       {:error, %Ecto.Changeset{} = changeset} ->

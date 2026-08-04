@@ -105,7 +105,11 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
 
     assigns =
       assign_new(assigns, :class, fn ->
-        ["btn", Map.fetch!(variants, assigns[:variant])]
+        [
+          "btn transition-all",
+          "hover:shadow-md active:scale-95",
+          Map.fetch!(variants, assigns[:variant])
+        ]
       end)
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
