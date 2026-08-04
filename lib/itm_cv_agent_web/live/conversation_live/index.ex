@@ -7,52 +7,90 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <.header>
-        Samtaler
-        <:actions>
-          <.button variant="primary" navigate={~p"/conversations/new"}>
-            <.icon name="hero-plus" /> Ny samtale
-          </.button>
-        </:actions>
-      </.header>
-
-      <div :if={@streams.conversations == []} class="flex flex-col items-center justify-center py-20 text-center">
-        <div class="max-w-md space-y-4">
-          <p class="text-lg font-medium text-base-content">
-            Ingen samtaler endnu
+      <div class="flex items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 class="text-2xl font-bold">Samtaler</h1>
+          <p class="text-base-content/70 mt-1">
+            Administrer dine samtaler om projekterfaringer
           </p>
-          <p class="text-base text-base-content/70">
-            Start din første samtale om at skrive projekterfaringer.
-          </p>
-          <.button variant="primary" navigate={~p"/conversations/new"} class="mt-4">
-            <.icon name="hero-plus" /> Opret samtale
-          </.button>
         </div>
+        <.button
+          variant="primary"
+          navigate={~p"/conversations/new"}
+          class="inline-flex items-center gap-2"
+        >
+          <.icon name="hero-plus" class="size-5" /> Ny samtale
+        </.button>
       </div>
 
-      <.table
-        :if={@streams.conversations != []}
-        id="conversations"
-        rows={@streams.conversations}
-        row_click={fn {_id, conversation} -> JS.navigate(~p"/conversations/#{conversation}") end}
+      <div
+        :if={@streams.conversations == []}
+        class="flex flex-col items-center justify-center py-20 text-center"
       >
-        <:col :let={{_id, conversation}} label="Navn">{conversation.name}</:col>
-        <:action :let={{_id, conversation}}>
-          <div class="sr-only">
-            <.link navigate={~p"/conversations/#{conversation}"}>Vis</.link>
+        <div class="inline-flex items-center justify-center size-20 rounded-2xl bg-base-200 mb-6">
+          <.icon name="hero-chat-bubble-left-right" class="size-10 text-base-content/40" />
+        </div>
+        <h2 class="text-xl font-semibold mb-2">Ingen samtaler endnu</h2>
+        <p class="text-base-content/70 max-w-sm mb-6">
+          Start din første samtale om at skrive projekterfaringer. Agenten guider dig gennem processen.
+        </p>
+        <.button
+          variant="primary"
+          navigate={~p"/conversations/new"}
+          class="inline-flex items-center gap-2"
+        >
+          <.icon name="hero-plus" class="size-5" /> Opret samtale
+        </.button>
+      </div>
+
+      <div :if={@streams.conversations != []} class="space-y-4">
+        <div
+          :for={{id, conversation} <- @streams.conversations}
+          id={id}
+          class="group relative flex items-center gap-4 rounded-xl border border-base-200 bg-base-100 p-5 hover:border-secondary/50 hover:shadow-md transition-all duration-200"
+        >
+          <div class="inline-flex items-center justify-center size-12 rounded-xl bg-secondary/10 text-secondary flex-shrink-0">
+            <.icon name="hero-chat-bubble-left-right" class="size-6" />
           </div>
-          <.link navigate={~p"/conversations/#{conversation}/edit"}>Redigér</.link>
-        </:action>
-        <:action :let={{id, conversation}}>
+
           <.link
-            phx-click={JS.push("delete", value: %{id: conversation.id}) |> hide("##{id}")}
-            data-confirm="Er du sikker?"
-            class="text-error hover:text-error/80"
+            navigate={~p"/conversations/#{conversation}"}
+            class="flex-1 min-w-0 block group/name"
           >
-            Slet
+            <div class="font-semibold text-base group-hover/name:text-secondary transition-colors truncate">
+              {conversation.name}
+            </div>
+            <p class="text-sm text-base-content/60 mt-0.5">
+              Oprettet {format_date(conversation.inserted_at)}
+            </p>
           </.link>
-        </:action>
-      </.table>
+
+          <div class="flex items-center gap-2">
+            <.link
+              navigate={~p"/conversations/#{conversation}/edit"}
+              class="inline-flex items-center justify-center size-9 rounded-lg hover:bg-base-200 transition-colors"
+              aria-label="Redigér"
+              title="Redigér"
+            >
+              <.icon name="hero-pencil" class="size-4" />
+            </.link>
+            <.link
+              phx-click={JS.push("delete", value: %{id: conversation.id}) |> hide("##{id}")}
+              data-confirm="Er du sikker på, at du vil slette denne samtale?"
+              class="inline-flex items-center justify-center size-9 rounded-lg hover:bg-error/10 text-error transition-colors"
+              aria-label="Slet"
+              title="Slet"
+            >
+              <.icon name="hero-trash" class="size-4" />
+            </.link>
+          </div>
+
+          <.icon
+            name="hero-chevron-right"
+            class="size-5 text-base-content/40 group-hover:text-secondary group-hover:translate-x-1 transition-all"
+          />
+        </div>
+      </div>
     </Layouts.app>
     """
   end
@@ -73,7 +111,11 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Index do
     {:noreply, stream_delete(socket, :conversations, conversation)}
   end
 
-  defp list_conversations() do
+  defp list_conversations do
     Conversations.list_conversations()
+  end
+
+  defp format_date(%DateTime{} = datetime) do
+    Calendar.strftime(datetime, "%d. %b %Y kl. %H:%M")
   end
 end
