@@ -11,6 +11,7 @@ defmodule ItMinds.CvAgentWeb.Layouts do
   # skeleton of your application, namely HTML headers
   # and other static content.
   embed_templates "layouts/*"
+  alias ItMinds.CvAgentWeb.Logo
 
   @doc """
   Renders your app layout with sidebar navigation.
@@ -42,10 +43,7 @@ defmodule ItMinds.CvAgentWeb.Layouts do
         <!-- Logo & Toggle -->
         <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md">
-              <MaterialIcon.icon name="auto_awesome" size="24px" />
-            </div>
-            <span class="font-display-lg text-xl font-bold text-primary">CV Agent</span>
+            <Logo.logo />
           </div>
           <button
             id="sidebar-toggle"
