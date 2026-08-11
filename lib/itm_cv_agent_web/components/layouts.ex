@@ -33,7 +33,7 @@ defmodule ItMinds.CvAgentWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <div id="sidebar-wrapper" class="flex min-h-screen bg-background">
+    <div id="sidebar-wrapper" class="flex min-h-screen bg-background ds-grid">
       <!-- Sidebar -->
       <aside
         id="sidebar"
