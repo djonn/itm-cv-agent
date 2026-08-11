@@ -7,6 +7,11 @@
       "env": {
         "PLAYWRIGHT_BROWSERS_PATH": "/home/djonn/.cache/ms-playwright"
       }
+    },
+    "tidewave": {
+      "type": "remote",
+      "url": "http://localhost:4000/tidewave/mcp",
+      "enabled": true
     }
   }
 }
