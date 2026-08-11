@@ -86,10 +86,31 @@ defmodule ItMinds.CvAgentWeb do
       import Phoenix.HTML
       # Core UI components
       import ItMinds.CvAgentWeb.CoreComponents
+      # Material Icons
+      import ItMinds.CvAgentWeb.MaterialIcon
+      # Typography components
+      import ItMinds.CvAgentWeb.Typography
+      # Button components
+      import ItMinds.CvAgentWeb.Button
+      # Input components
+      import ItMinds.CvAgentWeb.Input
+      # Navigation components
+      import ItMinds.CvAgentWeb.Navigation
+      # Feedback components
+      import ItMinds.CvAgentWeb.Feedback
+      # Content components
+      import ItMinds.CvAgentWeb.Content
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias ItMinds.CvAgentWeb.Layouts
+      alias ItMinds.CvAgentWeb.MaterialIcon
+      alias ItMinds.CvAgentWeb.Typography
+      alias ItMinds.CvAgentWeb.Button
+      alias ItMinds.CvAgentWeb.Input
+      alias ItMinds.CvAgentWeb.Navigation
+      alias ItMinds.CvAgentWeb.Feedback
+      alias ItMinds.CvAgentWeb.Content
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

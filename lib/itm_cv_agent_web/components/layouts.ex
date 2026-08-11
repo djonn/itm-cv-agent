@@ -5,6 +5,7 @@ defmodule ItMinds.CvAgentWeb.Layouts do
   """
   use ItMinds.CvAgentWeb, :html
 
+
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
   # skeleton of your application, namely HTML headers
@@ -27,31 +28,32 @@ defmodule ItMinds.CvAgentWeb.Layouts do
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
-  attr :current_scope, :map,
-    default: nil,
-    doc: "the current [scope](https://phoenix.hexdocs.pm/scopes.html)"
-
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8 fixed top-0 left-0">
-      <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          CV Agent
-        </a>
-      </div>
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-end">
-          <li>
-            <.theme_toggle />
-          </li>
-        </ul>
+    <header class="border-b border-outline-variant/20 bg-surface">
+      <div class="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md">
+              <MaterialIcon.icon name="auto_awesome" size="24px" />
+            </div>
+            <span class="font-display-lg text-xl font-bold text-primary">CV Agent</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <nav class="hidden md:flex items-center gap-2">
+              <Navigation.nav_link navigate={~p"/"}>Home</Navigation.nav_link>
+              <Navigation.nav_link navigate={~p"/conversations"}>Conversations</Navigation.nav_link>
+              <Navigation.nav_link navigate={~p"/design-system"}>Design System</Navigation.nav_link>
+            </nav>
+          </div>
+        </div>
       </div>
     </header>
 
-    <main class="px-4 py-8 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
+    <main class="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="space-y-4">
         {render_slot(@inner_block)}
       </div>
     </main>
@@ -88,7 +90,7 @@ defmodule ItMinds.CvAgentWeb.Layouts do
         hidden
       >
         {gettext("Attempting to reconnect")}
-        <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
+        <MaterialIcon.icon name="refresh" size="16px" class="ml-1 motion-safe:animate-spin" />
       </.flash>
 
       <.flash
@@ -103,45 +105,8 @@ defmodule ItMinds.CvAgentWeb.Layouts do
         hidden
       >
         {gettext("Attempting to reconnect")}
-        <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
+        <MaterialIcon.icon name="refresh" size="16px" class="ml-1 motion-safe:animate-spin" />
       </.flash>
-    </div>
-    """
-  end
-
-  @doc """
-  Provides dark vs light theme toggle based on themes defined in app.css.
-
-  See <head> in root.html.heex which applies the theme before page load.
-  """
-  def theme_toggle(assigns) do
-    ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 [[data-theme-source=system]_&]:!left-0 transition-[left]" />
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="system"
-      >
-        <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="light"
-      >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="dark"
-      >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
     </div>
     """
   end

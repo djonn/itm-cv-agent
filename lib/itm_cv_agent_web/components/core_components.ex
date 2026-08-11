@@ -8,25 +8,12 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
   with doc strings and declarative assigns. You may customize and style
   them in any way you want, based on your application growth and needs.
 
-  The foundation for styling is Tailwind CSS, a utility-first CSS framework,
-  augmented with daisyUI, a Tailwind CSS plugin that provides UI components
-  and themes. Here are useful references:
-
-    * [daisyUI](https://daisyui.com/docs/intro/) - a good place to get
-      started and see the available components.
-
-    * [Tailwind CSS](https://tailwindcss.com) - the foundational framework
-      we build on. You will use it for layout, sizing, flexbox, grid, and
-      spacing.
-
-    * [Heroicons](https://heroicons.com) - see `icon/1` for usage.
-
-    * [Phoenix.Component](https://phoenix-live-view.hexdocs.pm/Phoenix.Component.html) -
-      the component system used by Phoenix. Some components, such as `<.link>`
-      and `<.form>`, are defined there.
+  The foundation for styling is Tailwind CSS with our custom design system.
+  We use Material Symbols Outlined for icons via the MaterialIcon component.
 
   """
   use Phoenix.Component
+  alias ItMinds.CvAgentWeb.MaterialIcon
   use Gettext, backend: ItMinds.CvAgentWeb.Gettext
 
   alias Phoenix.LiveView.JS
@@ -67,19 +54,19 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
       {@rest}
     >
       <div class={[
-        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap",
-        @kind == :info && "alert-info",
-        @kind == :error && "alert-error"
+        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap rounded-xl shadow-lg px-4 py-3 flex items-start gap-3",
+        @kind == :info && "bg-inverse-surface text-inverse-on-surface",
+        @kind == :error && "bg-error text-on-error"
       ]}>
-        <.icon :if={@kind == :info} name="hero-information-circle" class="size-5 shrink-0" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 shrink-0" />
+        <MaterialIcon.icon :if={@kind == :info} name="info" size="20px" />
+        <MaterialIcon.icon :if={@kind == :error} name="error" size="20px" />
         <div>
           <p :if={@title} class="font-semibold">{@title}</p>
           <p>{msg}</p>
         </div>
         <div class="flex-1" />
         <button type="button" class="group self-start cursor-pointer" aria-label={gettext("close")}>
-          <.icon name="hero-x-mark" class="size-5 opacity-40 group-hover:opacity-70" />
+          <MaterialIcon.icon name="close" size="18px" class="opacity-40 group-hover:opacity-70" />
         </button>
       </div>
     </div>
@@ -97,15 +84,36 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any
-  attr :variant, :string, values: ~w(primary)
+  attr :variant, :string, values: ~w(primary secondary ghost icon text), default: "primary"
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
+    base_classes = "font-interactive text-interactive transition-colors"
+
+    variant_classes =
+      case assigns[:variant] do
+        "primary" ->
+          "bg-primary-container text-on-primary px-6 py-3 rounded-full hover:bg-primary-container/90 active:scale-[0.98]"
+
+        "secondary" ->
+          "bg-transparent border border-outline-variant/50 text-primary px-6 py-3 rounded-full hover:bg-surface-container active:bg-surface-variant"
+
+        "ghost" ->
+          "bg-transparent text-secondary px-6 py-3 rounded-full hover:bg-secondary/10 active:bg-secondary/20"
+
+        "icon" ->
+          "bg-surface-container-high text-primary p-3 rounded-full hover:bg-surface-variant flex items-center justify-center"
+
+        "text" ->
+          "bg-transparent text-primary px-4 py-2 rounded-full hover:text-primary/70 flex items-center gap-2"
+
+        _ ->
+          base_classes
+      end
 
     assigns =
       assign_new(assigns, :class, fn ->
-        ["btn", Map.fetch!(variants, assigns[:variant])]
+        [base_classes, variant_classes]
       end)
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
@@ -212,48 +220,51 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
       end)
 
     ~H"""
-    <div class="fieldset mb-2">
-      <label for={@id}>
-        <input
-          type="hidden"
-          name={@name}
-          value="false"
-          disabled={@rest[:disabled]}
-          form={@rest[:form]}
-        />
-        <span class="label">
-          <input
-            type="checkbox"
-            id={@id}
-            name={@name}
-            value="true"
-            checked={@checked}
-            class={@class || "checkbox checkbox-sm"}
-            {@rest}
-          />{@label}
-        </span>
+    <div class="flex items-center gap-3">
+      <input
+        type="checkbox"
+        id={@id}
+        name={@name}
+        value="true"
+        checked={@checked}
+        class="w-5 h-5 rounded border-outline text-primary-container focus:ring-primary-container bg-surface-container-low cursor-pointer"
+        {@rest}
+      />
+      <label :if={@label} for={@id} class="font-body-md text-on-surface cursor-pointer">
+        {@label}
       </label>
-      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
+    <.error :for={msg <- @errors}>{msg}</.error>
     """
   end
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label for={@id}>
-        <span :if={@label} class="label mb-1">{@label}</span>
+    <div class="space-y-2">
+      <label :if={@label} for={@id} class="text-sm font-interactive text-on-surface-variant">
+        {@label}
+      </label>
+      <div class="relative">
         <select
           id={@id}
           name={@name}
-          class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
+          class={[
+            "w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl py-3 pl-4 pr-12 text-primary appearance-none focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all font-body-md cursor-pointer",
+            @class,
+            @errors != [] && (@error_class || "border-error")
+          ]}
           multiple={@multiple}
           {@rest}
         >
           <option :if={@prompt} value="">{@prompt}</option>
           {Phoenix.HTML.Form.options_for_select(@options, @value)}
         </select>
-      </label>
+        <MaterialIcon.icon
+          name="expand_more"
+          size="20px"
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+        />
+      </div>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -261,19 +272,20 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label for={@id}>
-        <span :if={@label} class="label mb-1">{@label}</span>
-        <textarea
-          id={@id}
-          name={@name}
-          class={[
-            @class || "w-full textarea",
-            @errors != [] && (@error_class || "textarea-error")
-          ]}
-          {@rest}
-        >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
+    <div class="space-y-2">
+      <label :if={@label} for={@id} class="text-sm font-interactive text-on-surface-variant">
+        {@label}
       </label>
+      <textarea
+        id={@id}
+        name={@name}
+        class={[
+          "w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl py-3 px-4 text-primary placeholder-on-surface-variant/50 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all font-body-md resize-none",
+          @class,
+          @errors != [] && (@error_class || "border-error")
+        ]}
+        {@rest}
+      ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -282,21 +294,22 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label for={@id}>
-        <span :if={@label} class="label mb-1">{@label}</span>
-        <input
-          type={@type}
-          name={@name}
-          id={@id}
-          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-          class={[
-            @class || "w-full input",
-            @errors != [] && (@error_class || "input-error")
-          ]}
-          {@rest}
-        />
+    <div class="space-y-2">
+      <label :if={@label} for={@id} class="text-sm font-interactive text-on-surface-variant">
+        {@label}
       </label>
+      <input
+        type={@type}
+        name={@name}
+        id={@id}
+        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        class={[
+          "w-full bg-surface-container-low border border-outline-variant/30 rounded-2xl py-3 px-4 text-primary placeholder-on-surface-variant/50 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all font-body-md",
+          @class,
+          @errors != [] && (@error_class || "border-error")
+        ]}
+        {@rest}
+      />
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -306,7 +319,7 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
   defp error(assigns) do
     ~H"""
     <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
-      <.icon name="hero-exclamation-circle" class="size-5" />
+      <MaterialIcon.icon name="error" size="16px" />
       {render_slot(@inner_block)}
     </p>
     """
@@ -314,6 +327,13 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
 
   @doc """
   Renders a header with title.
+
+  ## Examples
+
+      <.header>
+        Page Title
+        <:subtitle>Optional subtitle</:subtitle>
+      </.header>
   """
   slot :inner_block, required: true
   slot :subtitle
@@ -321,12 +341,12 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
 
   def header(assigns) do
     ~H"""
-    <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4"]}>
+    <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4 border-b border-outline-variant/20"]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8">
+        <h1 class="text-xl font-semibold leading-8 text-primary">
           {render_slot(@inner_block)}
         </h1>
-        <p :if={@subtitle != []} class="text-sm text-base-content/70">
+        <p :if={@subtitle != []} class="text-base text-on-surface-variant mt-1">
           {render_slot(@subtitle)}
         </p>
       </div>
@@ -367,34 +387,45 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
       end
 
     ~H"""
-    <table class="table table-zebra">
-      <thead>
-        <tr>
-          <th :for={col <- @col}>{col[:label]}</th>
-          <th :if={@action != []}>
-            <span class="sr-only">{gettext("Actions")}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
-        <tr :for={row <- @rows} id={@row_id && @row_id.(row)}>
-          <td
-            :for={col <- @col}
-            phx-click={@row_click && @row_click.(row)}
-            class={@row_click && "hover:cursor-pointer"}
-          >
-            {render_slot(col, @row_item.(row))}
-          </td>
-          <td :if={@action != []} class="w-0 font-semibold">
-            <div class="flex gap-4">
-              <%= for action <- @action do %>
-                {render_slot(action, @row_item.(row))}
-              <% end %>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="overflow-hidden rounded-2xl border border-outline-variant/10">
+      <table class="w-full">
+        <thead class="bg-surface-container-high">
+          <tr>
+            <th
+              :for={col <- @col}
+              class="px-6 py-3 text-left text-xs font-interactive text-on-surface-variant uppercase tracking-wide"
+            >
+              {col[:label]}
+            </th>
+            <th :if={@action != []} class="px-6 py-3">
+              <span class="sr-only">{gettext("Actions")}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          id={@id}
+          phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}
+          class="divide-y divide-outline-variant/10 bg-surface"
+        >
+          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="hover:bg-surface-container/50">
+            <td
+              :for={col <- @col}
+              phx-click={@row_click && @row_click.(row)}
+              class={[@row_click && "cursor-pointer", "px-6 py-4 text-sm text-on-surface"]}
+            >
+              {render_slot(col, @row_item.(row))}
+            </td>
+            <td :if={@action != []} class="px-6 py-4">
+              <div class="flex gap-4">
+                <%= for action <- @action do %>
+                  {render_slot(action, @row_item.(row))}
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     """
   end
 
@@ -414,12 +445,10 @@ defmodule ItMinds.CvAgentWeb.CoreComponents do
 
   def list(assigns) do
     ~H"""
-    <ul class="list">
-      <li :for={item <- @item} class="list-row">
-        <div class="list-col-grow">
-          <div class="font-bold">{item.title}</div>
-          <div>{render_slot(item)}</div>
-        </div>
+    <ul class="divide-y divide-outline-variant/10">
+      <li :for={item <- @item} class="py-4">
+        <div class="font-semibold text-primary">{item.title}</div>
+        <div class="text-on-surface-variant">{render_slot(item)}</div>
       </li>
     </ul>
     """

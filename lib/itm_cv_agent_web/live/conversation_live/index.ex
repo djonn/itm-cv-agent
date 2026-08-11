@@ -11,7 +11,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Index do
         Listing Conversations
         <:actions>
           <.button variant="primary" navigate={~p"/conversations/new"}>
-            <.icon name="hero-plus" /> New Conversation
+            <ItMinds.CvAgentWeb.CoreComponents.icon name="hero-plus" /> New Conversation
           </.button>
         </:actions>
       </.header>

@@ -138,7 +138,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
             aria-label={gettext("close")}
             disabled={@loading}
           >
-            <.icon name="hero-paper-airplane" class="size-5" />
+            <ItMinds.CvAgentWeb.CoreComponents.icon name="hero-paper-airplane" class="size-5" />
           </button>
         </.form>
       </div>
