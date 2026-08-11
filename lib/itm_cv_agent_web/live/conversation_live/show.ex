@@ -10,54 +10,38 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <Layouts.app flash={@flash} conversations={@conversations} current_path={@current_path}>
       <div class="w-full h-[calc(100dvh-64px)] flex flex-col ">
-        <.messages messages={@messages} loading={@loading} streaming_message={@streams.stream} />
+        <div :if={@messages == [] && !@loading} class="h-[50dvh]" />
+        <div :if={@messages == [] && !@loading}>
+          <p>
+            Start med at fortælle mig lidt om dit projekt, det behøver ikke være meget, bare så jeg har noget at gå ud fra.
+          </p>
+          <p>
+            Hvis du vil forbedre en eksisterende projekterfaring kan du også copy-paste direkte fra Flowcase.
+          </p>
+        </div>
+        <div class="h-[calc(100dvh-64px-126px)] overflow-auto scrollbar-none">
+          <div class="flex flex-col-reverse">
+            <%!-- NOTE: Elements are reversed so we scroll to bottom automatically --%>
+            <div class="h-[64px]" />
+            <div id="stream-parent" phx-update="stream" class={[
+              "flex flex-row justify-start py-5",
+              @loading || "hidden"
+            ]}>
+              <div :for={{dom_id, message} <- @streams.stream} id={dom_id}>
+                {raw(message.html)}
+              </div>
+            </div>
+            <.message
+              :for={message_envelop <- @messages |> Enum.reverse()}
+              :key={message_envelop.key}
+              type={message_envelop.type}
+              message={message_envelop.message}
+            />
+          </div>
+        </div>
         <.chat_input form={@form} loading={@loading} />
       </div>
     </Layouts.app>
-    """
-  end
-
-  attr :messages, :list, required: true, doc: "the list of user and assistant messages"
-  attr :loading, :boolean, required: true
-  attr :streaming_message, :any, required: true
-
-  defp messages(%{messages: [], loading: false} = assigns) do
-    ~H"""
-    <div>
-      <div class="h-[50dvh]" />
-      <div>
-        <p>
-          Start med at fortælle mig lidt om dit projekt, det behøver ikke være meget, bare så jeg har noget at gå ud fra.
-        </p>
-        <p>
-          Hvis du vil forbedre en eksisterende projekterfaring kan du også copy-paste direkte fra Flowcase.
-        </p>
-      </div>
-    </div>
-    """
-  end
-
-  defp messages(assigns) do
-    ~H"""
-    <div class="h-[calc(100dvh-64px-126px)] overflow-auto scrollbar-none">
-      <div class="flex flex-col-reverse">
-        <%!-- NOTE: Elements are reversed so we scroll to bottom automatically --%>
-        <div class="h-[64px]" />
-        <div :if={@loading}>
-          <p>Loading...</p>
-        </div>
-        <.streaming_message
-          :if={@loading}
-          streaming_message={@streaming_message}
-        />
-        <.message
-          :for={message_envelop <- @messages |> Enum.reverse()}
-          :key={message_envelop.key}
-          type={message_envelop.type}
-          message={message_envelop.message}
-        />
-      </div>
-    </div>
     """
   end
 
@@ -76,20 +60,6 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
     ~H"""
     <div class="flex flex-row justify-start py-5">
       <div><Markdown.markdown text={@message} /></div>
-    </div>
-    """
-  end
-
-  attr :streaming_message, :any, required: true
-
-  defp streaming_message(assigns) do
-    ~H"""
-    <div class="flex flex-row justify-start py-5">
-      <p id="stream-parent" phx-update="stream">
-        <div :for={{dom_id, message} <- @streaming_message} id={dom_id}>
-          {raw(message.html)}
-        </div>
-      </p>
     </div>
     """
   end
@@ -180,17 +150,21 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   end
 
   def handle_info({:update_stream, message}, socket) do
-    md_doc = MDEx.Document.put_markdown(socket.assigns.stream_mdex, message.message)
-    html_content = MDEx.to_html!(md_doc)
+    if not socket.assigns.loading do
+      {:noreply, socket}
+    else
+      md_doc = MDEx.Document.put_markdown(socket.assigns.stream_mdex, message.message)
+      html_content = MDEx.to_html!(md_doc)
 
-    message = message |> Map.put(:html, html_content) |> Map.put(:id, "streaming")
+      message = %{html: html_content, id: "streaming"}
 
-    {
-      :noreply,
-      socket
-      |> stream_insert(:stream, message)
-      |> assign(:stream_mdex, md_doc)
-    }
+      {
+        :noreply,
+        socket
+        |> stream_insert(:stream, message, at: -1, limit: 1)
+        |> assign(:stream_mdex, md_doc)
+      }
+    end
   end
 
   defp context_to_message(context) do
