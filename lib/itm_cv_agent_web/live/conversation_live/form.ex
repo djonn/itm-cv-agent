@@ -7,7 +7,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} conversations={@conversations} current_path={@current_path}>
       <.header>
         {@page_title}
         <:subtitle>Use this form to manage conversation records in your database.</:subtitle>
@@ -30,6 +30,16 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
      socket
      |> assign(:return_to, return_to(params["return_to"]))
      |> apply_action(socket.assigns.live_action, params)}
+  end
+
+  @impl true
+  def handle_params(_params, url, socket) do
+    {:noreply, assign_current_path(socket, url)}
+  end
+
+  defp assign_current_path(socket, url) do
+    uri = URI.parse(url)
+    assign(socket, :current_path, uri.path)
   end
 
   defp return_to("show"), do: "show"

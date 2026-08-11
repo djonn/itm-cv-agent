@@ -167,3 +167,20 @@
 }
 
 /* This file is for your main application CSS */
+
+/* Sidebar toggle styles */
+#sidebar-open {
+  display: none;
+}
+
+#sidebar-wrapper.sidebar-closed #sidebar {
+  transform: translateX(-100%);
+}
+
+#sidebar-wrapper.sidebar-closed #main-content {
+  margin-left: 0;
+}
+
+#sidebar-wrapper.sidebar-closed #sidebar-open {
+  display: block;
+}

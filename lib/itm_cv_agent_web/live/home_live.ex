@@ -1,0 +1,161 @@
+defmodule ItMinds.CvAgentWeb.HomeLive do
+  use ItMinds.CvAgentWeb, :live_view
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} conversations={@conversations} current_path={@current_path}>
+      <div class="min-h-screen py-20">
+        <div class="mx-auto max-w-4xl px-4">
+          <!-- Hero Section -->
+          <div class="text-center mb-16">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-container text-on-primary mb-6 shadow-lg">
+              <ItMinds.CvAgentWeb.MaterialIcon.icon name="auto_awesome" size="40px" />
+            </div>
+            <ItMinds.CvAgentWeb.Typography.display_large class="mb-4">Welcome to CV Agent</ItMinds.CvAgentWeb.Typography.display_large>
+            <ItMinds.CvAgentWeb.Typography.body_large class="text-on-surface-variant max-w-2xl mx-auto">
+              Your intelligent assistant for CV analysis and enhancement. Powered by advanced AI to help you create compelling professional narratives.
+            </ItMinds.CvAgentWeb.Typography.body_large>
+          </div>
+
+          <!-- Action Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <.link
+              navigate={~p"/conversations"}
+              class="group bg-surface p-6 rounded-2xl border border-outline-variant/15 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] block"
+            >
+              <div class="w-12 h-12 rounded-full bg-primary-container/10 text-primary-container flex items-center justify-center mb-4 group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+                <ItMinds.CvAgentWeb.MaterialIcon.icon name="chat" size="24px" />
+              </div>
+              <ItMinds.CvAgentWeb.Typography.headline_medium class="mb-2">Conversations</ItMinds.CvAgentWeb.Typography.headline_medium>
+              <ItMinds.CvAgentWeb.Typography.body_medium>
+                View and manage your conversation history with the AI assistant.
+              </ItMinds.CvAgentWeb.Typography.body_medium>
+            </.link>
+
+            <.link
+              navigate={~p"/conversations/new"}
+              class="group bg-surface p-6 rounded-2xl border border-outline-variant/15 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] block"
+            >
+              <div class="w-12 h-12 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mb-4 group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+                <ItMinds.CvAgentWeb.MaterialIcon.icon name="add" size="24px" />
+              </div>
+              <ItMinds.CvAgentWeb.Typography.headline_medium class="mb-2">New Chat</ItMinds.CvAgentWeb.Typography.headline_medium>
+              <ItMinds.CvAgentWeb.Typography.body_medium>
+                Start a new conversation to analyze or enhance your CV.
+              </ItMinds.CvAgentWeb.Typography.body_medium>
+            </.link>
+          </div>
+
+          <!-- Quick Start Section -->
+          <div class="bg-surface-container-lowest p-8 rounded-[24px] border border-outline-variant/10 shadow-sm">
+            <ItMinds.CvAgentWeb.Typography.headline_medium class="mb-6">Quick Start</ItMinds.CvAgentWeb.Typography.headline_medium>
+            <div class="space-y-4">
+              <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 font-interactive">
+                  1
+                </div>
+                <div>
+                  <ItMinds.CvAgentWeb.Typography.interactive class="mb-1">Upload your CV</ItMinds.CvAgentWeb.Typography.interactive>
+                  <ItMinds.CvAgentWeb.Typography.body_medium>
+                    Start by uploading your current CV in PDF or text format.
+                  </ItMinds.CvAgentWeb.Typography.body_medium>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 font-interactive">
+                  2
+                </div>
+                <div>
+                  <ItMinds.CvAgentWeb.Typography.interactive class="mb-1">Chat with AI</ItMinds.CvAgentWeb.Typography.interactive>
+                  <ItMinds.CvAgentWeb.Typography.body_medium>
+                    Discuss improvements, ask for suggestions, or request specific sections to be enhanced.
+                  </ItMinds.CvAgentWeb.Typography.body_medium>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 font-interactive">
+                  3
+                </div>
+                <div>
+                  <ItMinds.CvAgentWeb.Typography.interactive class="mb-1">Export & Download</ItMinds.CvAgentWeb.Typography.interactive>
+                  <ItMinds.CvAgentWeb.Typography.body_medium>
+                    Download your enhanced CV in your preferred format.
+                  </ItMinds.CvAgentWeb.Typography.body_medium>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <ItMinds.CvAgentWeb.Button.primary navigate={~p"/conversations/new"}>
+                Start New Conversation
+              </ItMinds.CvAgentWeb.Button.primary>
+              <ItMinds.CvAgentWeb.Button.secondary navigate={~p"/conversations"}>
+                View History
+              </ItMinds.CvAgentWeb.Button.secondary>
+            </div>
+          </div>
+
+          <!-- Features Section -->
+          <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-surface p-6 rounded-2xl border border-outline-variant/10">
+              <div class="flex items-center gap-3 mb-4">
+                <ItMinds.CvAgentWeb.MaterialIcon.icon name="smart_toy" size="24px" class="text-primary-container" />
+                <ItMinds.CvAgentWeb.Typography.headline_medium>AI-Powered Analysis</ItMinds.CvAgentWeb.Typography.headline_medium>
+              </div>
+              <ItMinds.CvAgentWeb.Typography.body_medium>
+                Get intelligent suggestions for improving your CV content, structure, and formatting based on industry best practices.
+              </ItMinds.CvAgentWeb.Typography.body_medium>
+            </div>
+
+            <div class="bg-surface p-6 rounded-2xl border border-outline-variant/10">
+              <div class="flex items-center gap-3 mb-4">
+                <ItMinds.CvAgentWeb.MaterialIcon.icon name="history" size="24px" class="text-secondary" />
+                <ItMinds.CvAgentWeb.Typography.headline_medium>Conversation History</ItMinds.CvAgentWeb.Typography.headline_medium>
+              </div>
+              <ItMinds.CvAgentWeb.Typography.body_medium>
+                Access all your previous conversations and CV versions anytime. Track your progress and iterate on improvements.
+              </ItMinds.CvAgentWeb.Typography.body_medium>
+            </div>
+
+            <div class="bg-surface p-6 rounded-2xl border border-outline-variant/10">
+              <div class="flex items-center gap-3 mb-4">
+                <ItMinds.CvAgentWeb.MaterialIcon.icon name="file_download" size="24px" class="text-primary-container" />
+                <ItMinds.CvAgentWeb.Typography.headline_medium>Multiple Formats</ItMinds.CvAgentWeb.Typography.headline_medium>
+              </div>
+              <ItMinds.CvAgentWeb.Typography.body_medium>
+                Export your CV in various formats including PDF, Word, and Markdown to suit different application requirements.
+              </ItMinds.CvAgentWeb.Typography.body_medium>
+            </div>
+
+            <div class="bg-surface p-6 rounded-2xl border border-outline-variant/10">
+              <div class="flex items-center gap-3 mb-4">
+                <ItMinds.CvAgentWeb.MaterialIcon.icon name="security" size="24px" class="text-secondary" />
+                <ItMinds.CvAgentWeb.Typography.headline_medium>Privacy First</ItMinds.CvAgentWeb.Typography.headline_medium>
+              </div>
+              <ItMinds.CvAgentWeb.Typography.body_medium>
+                Your data is handled with care. Conversations are stored securely and you maintain full control over your information.
+              </ItMinds.CvAgentWeb.Typography.body_medium>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket |> assign(:page_title, "CV Agent")}
+  end
+
+  @impl true
+  def handle_params(_params, url, socket) do
+    {:noreply, assign_current_path(socket, url)}
+  end
+
+  defp assign_current_path(socket, url) do
+    uri = URI.parse(url)
+    assign(socket, :current_path, uri.path)
+  end
+end

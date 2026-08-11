@@ -6,7 +6,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} conversations={@conversations} current_path={@current_path}>
       <.header>
         Listing Conversations
         <:actions>
@@ -50,11 +50,21 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Index do
   end
 
   @impl true
+  def handle_params(_params, url, socket) do
+    {:noreply, assign_current_path(socket, url)}
+  end
+
+  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     conversation = Conversations.get_conversation!(id)
     {:ok, _} = Conversations.delete_conversation(conversation)
 
     {:noreply, stream_delete(socket, :conversations, conversation)}
+  end
+
+  defp assign_current_path(socket, url) do
+    uri = URI.parse(url)
+    assign(socket, :current_path, uri.path)
   end
 
   defp list_conversations() do

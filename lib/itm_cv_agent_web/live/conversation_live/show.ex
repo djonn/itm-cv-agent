@@ -8,7 +8,7 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} conversations={@conversations} current_path={@current_path}>
       <div class="w-full h-[calc(100dvh-64px)] flex flex-col ">
         <.messages messages={@messages} loading={@loading} streaming_message={@streams.stream} />
         <.chat_input form={@form} loading={@loading} />
@@ -231,5 +231,15 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Show do
      |> stream(:stream, [])
      |> assign(:loading, false)
      |> assign(:form, to_form(%{"chat" => ""}))}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_params(_params, url, socket) do
+    {:noreply, assign_current_path(socket, url)}
+  end
+
+  defp assign_current_path(socket, url) do
+    uri = URI.parse(url)
+    assign(socket, :current_path, uri.path)
   end
 end

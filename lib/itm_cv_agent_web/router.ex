@@ -17,12 +17,14 @@ defmodule ItMinds.CvAgentWeb.Router do
   scope "/", ItMinds.CvAgentWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :default, on_mount: [{ItMinds.CvAgentWeb.LiveSocketHook, :default}] do
+      live "/", HomeLive, :index
 
-    live "/conversations", ConversationLive.Index, :index
-    live "/conversations/new", ConversationLive.Form, :new
-    live "/conversations/:id", ConversationLive.Show, :show
-    live "/conversations/:id/edit", ConversationLive.Form, :edit
+      live "/conversations", ConversationLive.Index, :index
+      live "/conversations/new", ConversationLive.Form, :new
+      live "/conversations/:id", ConversationLive.Show, :show
+      live "/conversations/:id/edit", ConversationLive.Form, :edit
+    end
   end
 
   # Other scopes may use custom stacks.
