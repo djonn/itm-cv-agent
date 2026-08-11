@@ -102,5 +102,5 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Form do
   end
 
   defp return_path("index", _conversation), do: ~p"/conversations"
-  defp return_path("show", conversation), do: ~p"/conversations/#{conversation}"
+  defp return_path("show", conversation), do: ~p"/chat/#{conversation}"
 end

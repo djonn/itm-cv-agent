@@ -98,6 +98,7 @@ defmodule ItMinds.CvAgentWeb.Input do
   attr :show_attachments, :boolean, default: true
   attr :show_image, :boolean, default: true
   attr :show_send, :boolean, default: true
+  attr :send_disabled, :boolean, default: false
   attr :class, :any, default: nil
   attr :rest, :global
 
@@ -108,7 +109,7 @@ defmodule ItMinds.CvAgentWeb.Input do
   def prompt(assigns) do
     ~H"""
     <div class={[
-      "bg-surface-container-low border border-outline-variant/30 rounded-[24px] p-2 flex flex-col shadow-inner focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all",
+      "bg-surface-container-low border border-outline-variant/30 rounded-[24px] p-2 flex items-end gap-2 shadow-inner focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all",
       @class
     ]}>
       <textarea
@@ -116,33 +117,36 @@ defmodule ItMinds.CvAgentWeb.Input do
         name={@name}
         value={@value}
         placeholder={@placeholder}
-        class="w-full bg-transparent border-none resize-none py-3 px-4 text-primary placeholder-on-surface-variant/50 focus:ring-0 min-h-[100px] font-body-md"
+        class="flex-1 bg-transparent border-none resize-none py-3 px-4 text-primary placeholder-on-surface-variant/50 focus:outline-none focus:ring-0 min-h-[56px] max-h-[200px] font-body-md"
         {@rest}
       />
-      <div :if={@show_attachments || @show_image || @show_send} class="flex justify-between items-center px-2 pb-2">
-        <div :if={@show_attachments || @show_image} class="flex gap-2">
-          <button
-            :if={@show_attachments}
-            type="button"
-            phx-click={@on_attach}
-            class="text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-full transition-colors flex items-center justify-center"
-          >
-            <MaterialIcon.icon name="attach_file" size="20px" />
-          </button>
-          <button
-            :if={@show_image}
-            type="button"
-            phx-click={@on_image}
-            class="text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-full transition-colors flex items-center justify-center"
-          >
-            <MaterialIcon.icon name="image" size="20px" />
-          </button>
-        </div>
+      <div class="flex gap-2">
+        <button
+          :if={@show_attachments}
+          type="button"
+          phx-click={@on_attach}
+          class="text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-full transition-colors flex items-center justify-center shrink-0"
+        >
+          <MaterialIcon.icon name="attach_file" size="20px" />
+        </button>
+        <button
+          :if={@show_image}
+          type="button"
+          phx-click={@on_image}
+          class="text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-full transition-colors flex items-center justify-center shrink-0"
+        >
+          <MaterialIcon.icon name="image" size="20px" />
+        </button>
         <button
           :if={@show_send}
-          type="button"
+          type="submit"
           phx-click={@on_send}
-          class="bg-primary-container text-on-primary p-2 rounded-full hover:bg-primary-container/90 transition-colors flex items-center justify-center shadow-sm"
+          disabled={@send_disabled}
+          class={[
+            "bg-primary-container text-on-primary p-2 rounded-full transition-colors flex items-center justify-center shadow-sm shrink-0",
+            @send_disabled && "opacity-50 cursor-not-allowed",
+            !@send_disabled && "hover:bg-primary-container/90"
+          ]}
         >
           <MaterialIcon.icon name="arrow_upward" size="20px" />
         </button>

@@ -20,9 +20,10 @@ defmodule ItMinds.CvAgentWeb.Router do
     live_session :default, on_mount: [{ItMinds.CvAgentWeb.LiveSocketHook, :default}] do
       live "/", HomeLive, :index
 
+      live "/chat/:id", ChatLive, :show
+
       live "/conversations", ConversationLive.Index, :index
       live "/conversations/new", ConversationLive.Form, :new
-      live "/conversations/:id", ConversationLive.Show, :show
       live "/conversations/:id/edit", ConversationLive.Form, :edit
     end
   end

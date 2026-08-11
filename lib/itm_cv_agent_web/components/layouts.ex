@@ -75,8 +75,8 @@ defmodule ItMinds.CvAgentWeb.Layouts do
               <Navigation.conversation_item
                 title={conversation.name || "Untitled"}
                 timestamp={format_timestamp(conversation)}
-                active={@current_path =~ ~r"^/conversations/#{conversation.id}"}
-                navigate={~p"/conversations/#{conversation}"}
+                active={@current_path =~ ~r"^/chat/#{conversation.id}"}
+                navigate={~p"/chat/#{conversation}"}
               />
             <% end %>
           </div>

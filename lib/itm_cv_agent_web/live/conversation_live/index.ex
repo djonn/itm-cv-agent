@@ -19,13 +19,10 @@ defmodule ItMinds.CvAgentWeb.ConversationLive.Index do
       <.table
         id="conversations"
         rows={@streams.conversations}
-        row_click={fn {_id, conversation} -> JS.navigate(~p"/conversations/#{conversation}") end}
+        row_click={fn {_id, conversation} -> JS.navigate(~p"/chat/#{conversation}") end}
       >
         <:col :let={{_id, conversation}} label="Name">{conversation.name}</:col>
         <:action :let={{_id, conversation}}>
-          <div class="sr-only">
-            <.link navigate={~p"/conversations/#{conversation}"}>Show</.link>
-          </div>
           <.link navigate={~p"/conversations/#{conversation}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, conversation}}>

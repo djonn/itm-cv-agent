@@ -16,7 +16,7 @@ defmodule ItMinds.CvAgentWeb.Navigation do
         title="Q3 Review"
         timestamp="Today • 2:30 PM"
         active={true}
-        navigate={~p"/conversations/123"}
+        navigate={~p"/chat/123"}
       />
 
       <ItMinds.CvAgentWeb.Navigation.breadcrumbs items={[{"Projects", "/projects"}, {"Design", nil}]} />
