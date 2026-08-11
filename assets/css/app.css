@@ -115,15 +115,6 @@
   --text-2xl--line-height: 56px;
 }
 
-/* Material Symbols Outlined font */
-@font-face {
-  font-family: "Material Symbols Outlined";
-  font-style: normal;
-  font-weight: 100 700;
-  font-display: swap;
-  src: url("https://fonts.gstatic.com/s/materialsymbolsoutlined/v103/kJF1BvYX7BgnkSrUwT8OhrdQw5oELNPIeeIi9evE.woff2") format("woff2");
-}
-
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
