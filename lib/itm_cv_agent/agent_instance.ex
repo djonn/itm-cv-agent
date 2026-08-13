@@ -2,6 +2,8 @@ defmodule ItMinds.CvAgent.AgentInstance do
   # restart transient means it will only be restarted if it stopped unexpectedly
   use GenServer, restart: :transient
 
+  require Logger
+
   alias Phoenix.PubSub
 
   alias ItMinds.CvAgent.AgentSupervisor
@@ -194,6 +196,13 @@ defmodule ItMinds.CvAgent.AgentInstance do
           |> Map.put(:agent_state, new_agent_state)
         )
 
+      has_text_content?(last_message) == false ->
+        dbg()
+        Logger.warning("Agent finished but had no response, removing last message from context and trying again", [state.instance_id])
+        context = state.context |> Map.update!(:messages, &List.delete_at(&1, -1))
+        state = state |> Map.put(:context, context)
+        handle_llm(state)
+
       true ->
         state
     end
@@ -232,6 +241,10 @@ defmodule ItMinds.CvAgent.AgentInstance do
   end
 
   defp has_tool_call?(_message), do: false
+
+  defp has_text_content?(%{role: :assistant} = message), do: message.content |> Enum.any?(& &1.type == :text)
+
+  defp has_text_content?(_message), do: false
 
   @spec is_set_state_result?(ItMinds.CvAgent.Agents.Behaviour.tool_response()) :: boolean()
   defp is_set_state_result?({_tool_call_id, {:set_state, _response, _state_updator}}), do: true
